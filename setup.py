@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 #(relative to the 'root' dir, where setup.py is)
 #You could be more specific.
 
-setup(name = "aimediasdk",
+setup(name = "mediasdk",
     version = "1.0.1",
     description = "tencent 媒体AI中台 sdk",
     author = "willzhen",
@@ -14,7 +14,7 @@ setup(name = "aimediasdk",
     #(If you have other packages (dirs) or modules (py files) then
     #put them into the package directory - they will be found
     #recursively.)
-    packages=['protobufspec', 'trpc_mock'],
+    packages=['mediasdk'],
     #'package' package must contain files (see list above)
     #I called the package 'package' thus cleverly confusing the whole issue...
     #This dict maps the package name =to=> directories
