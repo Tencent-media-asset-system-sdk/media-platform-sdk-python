@@ -14,7 +14,7 @@ setup(name = "aimediasdk",
     #(If you have other packages (dirs) or modules (py files) then
     #put them into the package directory - they will be found
     #recursively.)
-    packages=['protobufspec', 'trpc_mock'],
+    packages=['protobufspec/*', 'trpc_mock'],
     #'package' package must contain files (see list above)
     #I called the package 'package' thus cleverly confusing the whole issue...
     #This dict maps the package name =to=> directories
