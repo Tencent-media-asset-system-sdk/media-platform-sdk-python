@@ -22,7 +22,7 @@ setup(name = "aimediasdk",
     #It says, package *needs* these files.
     package_data = {'package' : files },
     #'runner' is in the root.
-    scripts = ["runner"],
+    # scripts = ["runner"],
     # long_description = """Really long text here.""",
     #
     #This next part it for the Cheese Shop, look a little down the page.
