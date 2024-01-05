@@ -1,0 +1,698 @@
+syntax = "proto3";
+
+import "common.proto";
+import "task_data.proto";
+
+package trpc.media.media;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/media/media";
+
+message MediaInfo {
+  string ParentMediaId = 1;                                 // 父资源ID
+  trpc.media.common.MediaType MediaType  = 2;         // 资源类型
+  string MediaName = 3;                                     // 资源名称
+  string MediaDescription = 4;                              // 资源简介
+  trpc.media.common.MediaSourceType MediaSource = 5;  // 资源来源
+  trpc.media.common.CategoryTagType MediaTag = 6;     // 资源标签
+  string MediaSecondTag = 7;                                // 资源二级标签
+  trpc.media.common.LangType MediaLang = 8;           // 语言类型
+  uint32 MediaExpiry = 9;                                   // 过期时间(小时)
+  string MediaCallbackURL = 10;                             // 创建资源后的回调地址
+}
+
+message TranscodeInfo {
+  string TranscodeFormat = 1;                // 转码后的视频格式
+  uint32 TranscodeBitRate = 2;               // 转码后的码率
+  uint32 TranscodeWidth = 3;                 // 转码后的宽
+  uint32 TranscodeHeight = 4;                // 转码后的高
+}
+
+message FileInfo {
+  string FileName = 1;                        // 文件名
+  string FileType = 2;                        // 文件类型
+  float FileSize = 3;                         // 文件字节数
+  string ContentMD5 = 4;                      // 文件内容的MD5值
+  string Key = 5;                             // 文件的Key
+  string Bucket = 6;                          // 文件的Bucket
+  string UploadId = 7;                        // 文件的UploadId
+  string FileExtension = 8;                   // 文件扩展名
+  string FileURL = 9;                         // 文件网络下载地址 URL
+}
+
+message MediaWorkflowTemplateInfo {
+  string WorkflowTemplateId = 1;                                   // 入库配置对应的Id，1.0版本不需要填，会自动根据媒体类型获取
+  trpc.media.common.WorkflowMode WorkflowMode = 2;           // 入库模式
+  bool AutoMatchTemplate = 3; // 是否需要入库
+}
+
+message OptionalInfo {
+  string Source = 1;
+  string OriginalFileURL = 2;
+  string CustomMessage = 3;
+}
+
+
+message MediaUnionInfo {
+  MediaInfo MediaInfo = 1;                                                   // 资源信息
+  TranscodeInfo TranscodeInfo = 2;                                           // 转码信息
+  trpc.media.common.DomainGroupInfo DomainGroupInfo = 3;               // 群组信息： 私有/公共/群组
+  FileInfo FileInfo = 4;                                                     // 文件信息
+  MediaWorkflowTemplateInfo MediaWorkflowTemplateInfo = 5;                   // 入库配置对应的模板信息，后续扩展
+  OptionalInfo OptionalInfo = 6;                                      // 可选信息
+}
+
+message CreateMediasRequest {
+  repeated MediaUnionInfo MediaUnionInfoSet = 1;
+}
+
+message CreateMediasOperateResponse {
+  string Key = 1;                         // 唯一确定一个文件
+  string MediaId = 2;                     // 资源Id
+  trpc.media.common.OperateResponse OperateResponse = 3;
+  string FileURL = 4;                     // 资源下载地址
+}
+
+message CreateMediasResponse {
+  repeated CreateMediasOperateResponse MediaOperateResponseSet = 1;
+}
+
+message MediaCommitInfo {
+  string MediaId = 1;                       // 资源Id
+  string UploadStatus = 2;                  // 资源上传状态
+  string UploadMessage = 3;                 // 资源上传的错误信息
+  string UploadProgress = 4;                // 资源上传进度
+}
+
+message CommitMediasRequest {
+  repeated MediaCommitInfo MediaCommitInfoSet = 1;
+}
+
+message MediaOperateResponse {
+  string MediaId = 1;                       // 资源Id
+  trpc.media.common.OperateResponse OperateResponse = 2;
+}
+
+message CommitMediasResponse {
+  repeated MediaOperateResponse MediaOperateResponseSet = 1;
+}
+
+message MediaMeta {
+  float Duration = 1;                       // 资源时长，仅限视频和音频
+  uint32 Width = 2;                         // 资源宽，仅限视频和图片
+  uint32 Height = 3;                        // 资源高，仅限视频和图片
+  float FPS = 4;                            // 资源帧率，仅限视频
+  uint32 BitRate = 5;                       // 资源码率，仅限视频
+  string Format = 6;                        // 资源格式，仅限视频/图片/音频
+  uint32 NumFrames = 7;                     // 资源帧数，仅限视频
+  string EncodeFormat = 8;                  // 视频/音频编码格式
+  float Longitude = 9;                      // 图片经度
+  float Latitude = 10;                      // 图片纬度
+  string CodecType = 11;                    // 解码器格式
+  float SampleRate = 12;                    // 采样率
+  string ChannelLayout = 13;                // 音频声道
+  uint32 Channels = 14;                     // 通道数
+}
+
+message CoverInfo {
+  repeated string CoverMediaIdSet = 1;      // 封面图MediaID集合
+  string TargetCoverMediaId = 2;            // 被选中的封面图Id
+}
+
+message MediaStorageProgress {
+  trpc.media.common.TaskStatus TranscodeStatus = 1;
+  trpc.media.common.TaskStatus CoverExtractStatus = 2;
+  trpc.media.common.TaskStatus IVLDStatus = 3;
+  trpc.media.common.TaskStatus FeatureStorageStatus = 4;
+}
+
+message MediaObject {
+  string MediaId = 1;                                                      // 资源Id
+  trpc.media.common.MediaStatus MediaStatus = 2;                     // 资源状态
+  string FailedReason = 3;                                                 // 资源状态对应的错误信息
+  trpc.media.common.UserInfo CreateUserInfo = 4;                     // 资源的创建者信息
+  trpc.media.common.UserInfo ModifyUserInfo = 5;                     // 资源的修改者信息
+  MediaInfo MediaInfo = 6;                                                 // 资源信息
+  trpc.media.common.DomainGroupInfo DomainGroupInfo = 7;             // 群组信息
+  FileInfo FileInfo = 8;                                                   // 文件信息
+  MediaWorkflowTemplateInfo MediaWorkflowTemplateInfo = 9;                 // 入库配置对应的模板信息
+  MediaMeta MediaMeta = 10;                                                // 媒体信息
+  string DownloadUrl = 11;                                                 // 下载路径
+  CoverInfo CoverInfo = 12;                                                // 封面图信息
+  trpc.media.taskdata.AllTaskData TaskData = 13;                          // 结构化数据
+  string MediaCreateTime = 14;                                             // 资源创建时间
+  string MediaModifyTime = 15;                                             // 资源修改时间
+  string CostTime = 16;                                                    // 资源入库消耗的时间
+  string TaskId = 17;                                                      // 对应的任务Id，方便进行标签操作
+  uint32 SubVersionCount = 18;                                             // 子版本数量
+  repeated string SubVersionMediaIdSet = 19;                               // 子版本的MediaId列表
+  string TaskModifyTime = 20;                                              // 对应的任务的更新时间，方便进行检索引擎的同步操作
+  string TransCodeMediaId = 21;                                            // 转码后的素材Id
+  MediaStorageProgress MediaStorageProgress = 22;                     // 资源入库的进度
+  OptionalInfo OptionalInfo = 23;                                     // 可选信息
+  repeated string PackageIdSet = 24;                                        // 资源所属资源包信息
+}
+
+message DescribeMediasRequest {
+  uint32 PageNumber = 1;                                                   // 分页Id
+  uint32 PageSize = 2;                                                     // 分页的大小
+  repeated trpc.media.common.Filter FilterSet = 3;                   // 过滤条件
+  repeated trpc.media.common.Sorter SorterSet = 4;                   // 排序条件
+  bool IsSubVersionExpand = 5;                                             // 是否展开子版本显示
+  uint32 Offset = 6;                                                       // 查询 Offset，优先用 PageNumber 和 PageSize
+  uint32 Limit = 7;                                                        // 查询 Limit，优先用 PageNumber 和 PageSize
+  bool IsDeleted = 8;                                                      // 回收站的过滤条件
+  trpc.media.common.DayRange CreateDayRange = 9;                      // 筛选创建时间区间
+}
+
+message DescribeMediasResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated MediaObject MediaObjectSet = 2;                                  // 返回的资源信息
+  uint32 TotalCount = 3;                                                    // 返回的资源个数
+}
+
+message DescribeMediaDetailsRequest {
+  repeated string MediaIdSet = 1;                                          // 资源Id集合
+}
+
+message DescribeMediaDetailsResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated MediaObject MediaObjectSet = 2;                                 // 返回的资源信息
+  uint32 TotalCount = 3;                                                   // 返回的资源个数
+}
+
+message DeleteMedia {
+  string MediaId = 1;
+  bool DeleteAllTasks = 2;                          // 是否删除全部绑定的任务
+  repeated string DeleteTaskSet = 3;                // 同时删除的任务
+}
+
+message DeleteMediasRequest {
+  trpc.media.common.DeleteType DeleteType = 1;               // 删除类型
+  repeated DeleteMedia DeleteSet = 2;      // 删除的媒体
+}
+
+message DeleteMediasResponse {
+  repeated MediaOperateResponse MediaOperateResponseSet = 1;
+}
+
+message RestoreDeletedMediasRequest {
+  repeated string DeletedMediaIdSet = 1; // 需要恢复的已经被删除的媒体ID
+}
+
+message RestoreDeletedMediasResponse {
+  repeated MediaOperateResponse MediaOperateResponseSet = 1;
+}
+
+message EmptyTrashRequest {
+}
+
+message EmptyTrashResponse {
+  uint32 TotalCount = 1; // 清理的媒体的数量
+}
+
+message DescribeCategoriesRequest {
+}
+
+message Category {
+  trpc.media.common.MediaType MediaType = 1;                         // 资源类型
+  repeated trpc.media.common.CategoryTagType TagSet = 2;             // 对应的资源类型可选的标签
+}
+
+message DescribeCategoriesResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated Category CategorySet = 2;                                       // 资源的类别信息
+}
+
+message ModifyMediaRequest {
+  string MediaId = 1;                                                       // 资源Id
+  MediaInfo MediaInfo = 2;                                                  // 修改后的资源信息
+  trpc.media.common.DomainGroupInfo DomainGroupInfo = 3;                    // 修改后的群组
+  CoverInfo CoverInfo = 4;                                                  // 修改后的封面图信息
+  MediaWorkflowTemplateInfo MediaWorkflowTemplateInfo = 5;                  // 修改后的入库模板信息
+  bool EmptyReplace = 6;
+  OptionalInfo OptionalInfo = 7;                // 修改后的可选信息
+}
+
+message ModifyMediaResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+}
+
+message MediaSegment {
+  optional float StartTimeStamp = 1;                   // 片段开始时间
+  optional float EndTimeStamp = 2;                     // 片段结束时间
+  optional float Confidence = 3;                       // 置信度
+}
+
+message RetrieveHitInfo {
+  MediaObject MediaObject = 1;                          // 资源信息
+  repeated string RetrieveHitTagSet = 2;                // 被选中的标签集合
+  repeated MediaSegment HitSegmentSet = 3;              // 被选中的片段集合
+  MatchLevelType MatchLevel = 4;                        // 匹配级别
+  AlgoType AlgoType = 5;                                // 命中的算法类型
+  string Key = 6;                                       // 如果命中自定义消息, 返回自定消息的 key
+}
+
+message RetrieveHitMedia {
+  MediaObject MediaObject = 1;                          // 资源信息
+  repeated MediaSegment HitSegmentSet = 3;              // 被选中的片段集合
+}
+
+message RetrieveHitFace {
+  string Name = 1;
+  string Job = 2;
+  string Label = 3;
+  string SecondLabel = 4;
+  string ImageURL = 5;
+  string FaceId = 6;
+  int32 IsUnknown = 7;
+  bool PutLibraryAllowed = 8;
+  repeated RetrieveHitMedia HitMediaSet = 9;
+  string AttachPersonId = 10;
+  trpc.media.common.Rect Rect = 11;                                  // 在检索图像中出现的矩形框
+  int32 Sensitive = 12; 
+  float Quality = 13;
+  float Confidence = 14;
+  repeated string GroupIdSet = 15;
+}
+
+message LexicalEntryInfo{
+  string LexicalEntryTitle = 1;                                            // 知识库词条标题
+  string LexicalEntryContent = 2;                                          // 知识库词条内容
+  string LexicalEntryThumbnail = 3;                                        // 知识库缩略图
+}
+
+message RetrieveRelevantTagsRequest {
+  trpc.media.common.RetrieveInputType RetrieveInputType = 1;           // 检索输入数据类别
+  string RetrieveInputData = 2;                                              // 检索输入数据
+}
+
+message RetrieveTagInfo{
+  trpc.media.common.RetrieveTagType RetrieveTagType = 1;
+  string TagContent = 2;
+}
+
+message RetrieveRelevantTagsResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated RetrieveTagInfo RelevantTagSet = 2;                              // 检索返回的标签集合(地标)
+  uint32 TotalCount = 3;                                                    // 检索返回的标签个数
+  trpc.media.common.RetrieveHitSourceType RetrieveHitSourceType = 4;  // 检索结果的来源，检索引擎还是兜底逻辑
+}
+
+message RetrieveLexicalEntryRequest {
+  trpc.media.common.RetrieveInputType RetrieveInputType = 1;           // 检索输入数据类别，这里其实就是关键词
+  string RetrieveInputData = 2;                                              // 检索输入数据
+}
+
+message RetrieveLexicalEntryResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  LexicalEntryInfo LexicalEntryInfo = 2;                                    // 检索关键词对应的词条信息
+  trpc.media.common.RetrieveHitSourceType RetrieveHitSourceType = 3;  // 检索结果的来源，检索引擎还是兜底逻辑
+}
+
+message RetrieveMediasRequest {
+  trpc.media.common.RetrieveInputType RetrieveInputType = 1;           // 检索输入数据类别
+  string RetrieveInputData = 2;                                              // 检索输入数据
+  repeated trpc.media.common.Filter FilterSet = 3;                     // 检索结果的过滤信息
+  repeated trpc.media.common.Sorter SorterSet = 5;                     // 检索结果的排序信息
+  uint32 PageNumber = 6;                                                     // 分页Id
+  uint32 PageSize = 7;                                                       // 分页的大小
+}
+
+message RetrieveMediasResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated RetrieveHitInfo RetrieveHitInfoSet = 2;
+  uint32 TotalCount = 3;
+  trpc.media.common.RetrieveHitSourceType RetrieveHitSourceType = 4;  // 检索结果的来源，检索引擎还是兜底逻辑
+}
+
+message RetrieveFacesResponse {
+  uint32 TotalCount = 1;
+  repeated RetrieveHitFace HitFaceSet = 3;
+}
+
+message RetrieveConsistentMediasRequest {
+  string MediaId = 1;
+  int32 TopN = 2;
+  float Threshold = 3;
+}
+
+message RetrieveConsistentMediasResponse {
+  repeated string HitMediaIdSet = 1;
+}
+
+message AssociateWordsRequest {
+  string Text = 1;                                                          // 待联想的关键字
+}
+
+message AssociateWordsResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated string WordSet = 2;                                              // 返回的联想词信息
+  uint32 TotalCount = 3;                                                    // 联想词的个数，当前最多支持8个联想词
+}
+
+message ExtractImagesRequest {
+  repeated uint32 FrameIndexSet = 1;                                        // 待提取的帧号
+  trpc.media.common.ExtractImageType ExtractImageType = 2;            // 提取图片后返回的类别
+  bool IsSetTargetCover = 3;                                                // 是否需要设置封面
+  uint32 TargetCoverFrameIndex = 4;                                         // 需要设置为封面的帧号
+  string MediaId = 5;                                                       // 当前素材的MediaId
+}
+
+message ImageInfo {
+  uint32 FrameIndex = 1;                                                    // 帧号
+  string Image = 2;                                                         // 图片数据
+  trpc.media.common.ExtractImageType ExtractImageType = 3;            // 提取图片后返回的类别
+}
+
+message ExtractImagesResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated ImageInfo ImageInfoSet = 2;                                      // 返回的图片信息
+  uint32 TotalCount = 3;                                                    // 返回的图片个数
+}
+
+
+message Binder {
+  trpc.media.common.BindType BindType = 1;                            // 绑定资源的类型，目前只有“封面图”这种类型
+  repeated string BinderMediaIdSet = 2;                                     // 绑定的资源Id集合，比如封面图集合
+  repeated string BindeeMediaIdSet = 3;                                     // 被绑定的资源Id集合，比如封面图对应的原始资源
+}
+
+message BindMediasRequest {
+  repeated Binder BinderSet = 1;                                            // 绑定信息
+}
+  
+message BindMediasResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+}
+
+// 检索引擎使用
+message DescribeMediaDetailsInnerRequest {
+  string MediaStartTime = 1;                                                // 拉取的起始时间,media表的更新时间
+  string TaskStartTime = 2;                                                 // 拉取的起始时间，task表的标签更新时间
+  uint32 Count = 3;                                                         // 拉取资源的数目
+  repeated trpc.media.common.Filter FilterSet = 4;                    // 检索结果的过滤信息
+}
+
+message DescribeMediaDetailsInnerResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated MediaObject MediaObjectSet = 2;                                 // 返回的资源信息
+  uint32 TotalCount = 3;                                                   // 返回的资源个数
+  string TaskUpdateTime = 4;
+}
+
+// 数据中心-获取下载路径
+message DataCenterCreateDownloadURLRequest {
+  string Uin = 1 [json_name="Uin"];
+  repeated string Keys = 2 [json_name="Keys"];
+  bool Boolean = 3 [json_name="IsTemp"];
+  int32 MaxAge = 4 [json_name="MaxAge"];
+}
+
+message DataCenterError{
+  string Code = 1;
+  string Message = 2;
+}
+
+message DataCenterResponse {
+  string RequestId = 1 [json_name="RequestId"];
+  DataCenterError Error = 2 [json_name="Error"];
+  repeated string URLs = 3 [json_name="URLs"];
+  string ExpireTime = 4 [json_name="ExpireTime"];
+}
+
+message DataCenterCreateDownloadURLResponse {
+  DataCenterResponse Response = 1 [json_name="Response"];
+}
+
+// 数据中心-删除文件
+message DataCenterCreateDeleteFileTaskRequest {
+  repeated string FileKeys = 1 [json_name="FileKeys"];
+  bool Async = 2 [json_name="Async"];
+}
+
+
+// 检索引擎
+enum IntentType {
+  INTENT_TYPE_NONE = 0;
+  INTENT_TYPE_LANDMARK = 1;
+}
+
+// 检索文本
+message QueryText {
+  string Text = 1 [json_name="text"];
+}
+
+// 检索图像
+message QueryImage {
+  string MediaId = 1 [json_name="media_id"];
+  string LocalImagePath = 2 [json_name="local_image_path"];
+  bytes Image = 3 [json_name="image"];
+}
+
+// 搜索意图
+message RetrieveTagItem {
+  IntentType IntentType = 1 [json_name="type"];
+  string TagName = 2 [json_name="tag_name"];
+}
+
+// 知识库
+message LexicalEntryData {
+  string Title = 1 [json_name="title"];          // 知识库标题
+  string SubTitle = 2 [json_name="title_sub"];   // 知识库子标题
+  string Content = 3 [json_name="content"];      // 知识库内容
+  bytes Thumbnail = 4 [json_name="thumbnail"];   // 知识库缩略图
+}
+
+enum AlgoType {
+  ALGO_TYPE_NONE = 0;
+  ALGO_TYPE_FULLTEXT = 1;
+  ALGO_TYPE_IMAGE2IMAGE = 2;
+  ALGO_TYPE_IMAGE2VIDEO = 3;
+  ALGO_TYPE_TEXT2TEXT = 4;
+  ALGO_TYPE_TEXT2IMAGE = 5;
+  ALGO_TYPE_TEXT2VIDEO = 6;
+  ALGO_TYPE_MULTIMODAL = 7;
+}
+
+enum SourceType {
+  SOURCE_TYPE_NONE = 0;
+  SOURCE_TYPE_FILENAME = 1;
+  SOURCE_TYPE_TITLE = 2;
+  SOURCE_TYPE_PERSON_TAG = 3;
+  SOURCE_TYPE_CV_TAG = 4;
+  SOURCE_TYPE_SUMMARY = 5;
+  SOURCE_TYPE_NER = 6;
+  SOURCE_TYPE_KEYWORD = 7;
+  SOURCE_TYPE_ASR = 8;
+  SOURCE_TYPE_OCR_CAPTION = 9;
+  SOURCE_TYPE_BACKGROUND = 10;
+  SOURCE_TYPE_FULLTEXT = 11;
+  SOURCE_TYPE_FEATURE = 12;
+  SOURCE_TYPE_MULTIMODAL = 13;
+  SOURCE_TYPE_CUSTOM_MESSAGE = 14;
+}
+
+message RetrievalMediaTagInfo{
+  string MediaId = 1  [json_name="media_id"];
+  repeated string TagSet = 2  [json_name="tag_set"];
+}
+
+enum MatchLevelType {
+    MATCH_LEVEL_TYPE_NONE = 0;
+    MATCH_LEVEL_TYPE_LOW = 1;  // 匹配级别低
+    MATCH_LEVEL_TYPE_MIDDLE = 2; // 匹配级别中(类似结果)
+    MATCH_LEVEL_TYPE_HIGH = 3; // 匹配级别高(匹配结果)
+}
+
+message RetrieveEngineMediaSegment {
+  float StartTime = 1 [json_name="start_time"];                   // 片段开始时间
+  float EndTime = 2 [json_name="end_time"];                     // 片段结束时间
+  float Confidence = 3 [json_name="confidence"];                   // 置信度
+}
+
+// 匹配结果
+message RetrieveEngineRetrieveHitInfo {
+  string MediaId = 1 [json_name="media_id"];                                  // 匹配中的媒资id
+  trpc.media.common.MediaType MediaType = 2 [json_name="media_type"];         // 媒资类型
+  AlgoType AlgoType  = 3 [json_name="algo_type"];                             // 匹配的算法类型
+  SourceType SourceType = 4 [json_name="source_type"];                        // 匹配的数据类型
+  repeated string HitTagSet = 5 [json_name="hit_tag_set"];                    // 高亮的标签列表
+  repeated RetrieveEngineMediaSegment SegmentSet = 6 [json_name="segment_set"];// 媒体片段列表
+  trpc.media.common.CategoryTagType MediaTag = 7 [json_name="media_tag"];      // 媒资标签
+  MatchLevelType MatchLevel = 8 [json_name="match_level"];                     // 匹配级别
+  string Key = 9 [json_name="key"]; // 匹配到的自定义消息的 key
+}
+
+message FilterBy {
+  trpc.media.common.MediaType MediaType = 1 [json_name="media_type"];
+  repeated trpc.media.common.CategoryTagType MediaTagSet = 2 [json_name="media_tag_set"];
+}
+
+message RetrieveEngineRetrieveRequest {
+  string SessionId = 1 [json_name="session_id"];
+  string Uin = 2 [json_name="uin"];
+  string SubAccountUin = 3 [json_name="sub_account_uin"];
+  repeated trpc.media.common.DomainGroupInfo DomainGroupInfoSet = 4 [json_name="domain_groups"];
+  QueryText QueryText = 5 [json_name="query_text"];
+  QueryImage QueryImage = 6 [json_name="query_image"];
+  uint32 PageNumber = 7[json_name="page_no"];
+  uint32 PageSize = 8 [json_name="page_size"];
+  FilterBy FilterBy = 9 [json_name="filter_by"];
+}
+
+message RetrieveEngineRetrieveResponse {
+  string SessionId = 1 [json_name="session_id"];
+  int32 ErrorCode = 2 [json_name="errorcode"];
+  string ErrorMsg = 3 [json_name="errormsg"];
+  repeated RetrieveTagItem RetrieveIntentSet = 4 [json_name="tag_set"];
+  repeated LexicalEntryData LexicalEntryDataSet = 5 [json_name="lexical_entry_set"];
+  repeated RetrieveEngineRetrieveHitInfo RetrieveHitInfoSet = 6 [json_name="hit_info_set"];
+  int32 RetrieveHitTotalCount = 7 [json_name="hit_total_count"];
+}
+
+// 检索引擎-联想词
+message RetrieveEngineAssociateWordsRequest {
+  string SessionId = 1 [json_name="session_id"];
+  string Uin = 3 [json_name="uin"];
+  string SubAccountUin = 4 [json_name="sub_account_uin"];
+  int32 Count = 5 [json_name="count"];
+  string Text = 6 [json_name="text"];
+}
+
+message RetrieveEngineAssociateWordsResponse {
+  string SessionId = 1[json_name="session_id"];
+  int32 ErrorCode = 2 [json_name="errorcode"];
+  string ErrorMsg = 3 [json_name="errormsg"];
+  repeated string Words = 4 [json_name="texts"];
+}
+
+// 抽帧引擎-抽取图片
+message FrameData {
+  bytes Frame = 1 [json_name="frame"];
+  uint32 FrameIndex = 2 [json_name="frame_index"];
+}
+
+message ExtractImageEngineExtractFramesRequest {
+  string SessionId = 1 [json_name="session_id"];
+  string AppID = 2 [json_name="app_id"];
+  string LocalVideoPath = 3 [json_name="local_video_path"];
+  repeated int32 FrameIndexs = 4 [json_name="frame_indexs"];
+}
+
+message ExtractImageEngineExtractFramesResponse {
+  string SessionId = 1[json_name="session_id"];
+  int32 ErrorCode = 2 [json_name="errorcode"];
+  string ErrorMsg = 3 [json_name="errormsg"];
+  repeated FrameData FrameData = 4 [json_name="frame_data"];
+}
+
+//创建资源包请求
+message CreateResourcePackageRequest {
+  string Name = 1 [json_name="name"];
+  repeated string MediaIdSet = 2 [json_name="media_id_set"];
+  repeated MediaUnionInfo MediaSet = 3 [json_name="media_set"];
+}
+
+message CreateResourcePackageResponse {
+  PackageOperateResponse PackageOperateResponse = 1 [json_name="package_operate_response"];
+}
+
+message PackageOperateResponse {
+  string ResourcePackageId = 1 [json_name="resource_package_id"];
+  trpc.media.common.OperateResponse OperateResponse = 2;
+  repeated string MediaIdSet = 3 [json_name="media_id_set"];
+  repeated CreateMediasOperateResponse CreateMediaOperateResponseSet = 4;
+}
+
+message DeleteResourcePackageRequest {
+  string PackageId = 1 [json_name="package_id"];
+}
+
+message ResourcePackageOperateResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+}
+
+message UpdateResourcePackageRequest {
+  string PackageId = 1 [json_name="package_id"];
+  string PackageName = 2 [json_name="package_Name"];
+}
+
+message DescribeResourcePackageRequest {
+  uint32 PageNumber = 1;
+  uint32 PageSize = 2;
+  uint32 Offset = 3;
+  uint32 Limit = 4;
+  repeated trpc.media.common.Filter FilterSet = 5;
+  repeated trpc.media.common.Sorter SorterSet = 6;
+  bool IsDeleted = 7;
+}
+
+message DescribePackageResponse {
+  repeated ResourcePackage ResourcePackages = 1;
+  int32 Count = 2;
+  trpc.media.common.OperateResponse OperateResponse = 3;
+}
+
+message ResourcePackage {
+  string Id = 1;
+  string Name = 2;
+  repeated string MediaIdSet = 3;
+  repeated string DeletedMediaIdSet = 4;
+}
+
+message AddResourceToPackageRequest {
+  string PackageId = 1;
+  repeated string MediaIdSet = 2;
+  repeated MediaUnionInfo MediaSet = 3;
+}
+
+message AddResourceToPackageResponse {
+  PackageOperateResponse PackageOperateResponse = 1;
+}
+
+message DeleteResourceFromPackageRequest {
+  string PackageId = 1;
+  repeated string MediaIdSet = 2;
+}
+
+message UndeleteResourceFromPackageRequest {
+  string PackageId = 1;
+  repeated string MediaIdSet = 2;
+}
+
+service Media {
+  // 资源管理
+  rpc CreateMedias(CreateMediasRequest) returns (CreateMediasResponse); // @alias=/CreateMedias
+  rpc CommitMedias(CommitMediasRequest) returns (CommitMediasResponse); // @alias=/CommitMedias
+  rpc DescribeMedias(DescribeMediasRequest) returns (DescribeMediasResponse); // @alias=/DescribeMedias
+  rpc DescribeMediaDetails(DescribeMediaDetailsRequest) returns (DescribeMediaDetailsResponse); // @alias=/DescribeMediaDetails
+  rpc DeleteMedias(DeleteMediasRequest) returns (DeleteMediasResponse); // @alias=/DeleteMedias
+  rpc RestoreDeletedMedias(RestoreDeletedMediasRequest) returns (RestoreDeletedMediasResponse); // @alias=/RestoreDeletedMedias
+  rpc EmptyTrash(EmptyTrashRequest) returns (EmptyTrashResponse); // @alias=/EmptyTrash
+  rpc DescribeCategories(DescribeCategoriesRequest) returns (DescribeCategoriesResponse); // @alias=/DescribeCategories
+  rpc ModifyMedia(ModifyMediaRequest) returns (ModifyMediaResponse); // @alias=/ModifyMedia
+  rpc RetrieveRelevantTags(RetrieveRelevantTagsRequest) returns (RetrieveRelevantTagsResponse); // @alias=/RetrieveRelevantTags
+  rpc RetrieveLexicalEntry(RetrieveLexicalEntryRequest) returns (RetrieveLexicalEntryResponse); // @alias=/RetrieveLexicalEntry
+  // RetrieveTitleMedias 和 RetrieveContentMedias 目前废弃不用了
+  rpc RetrieveTitleMedias(RetrieveMediasRequest) returns (RetrieveMediasResponse); // @alias=/RetrieveTitleMedias 
+  rpc RetrieveContentMedias(RetrieveMediasRequest) returns (RetrieveMediasResponse); // @alias=/RetrieveContentMedias
+  rpc RetrieveTextMultiModalMedias(RetrieveMediasRequest) returns (RetrieveMediasResponse); // @alias=/RetrieveTextMultiModalMedias
+  rpc RetrieveTextCrossModalMedias(RetrieveMediasRequest) returns (RetrieveMediasResponse); // @alias=/RetrieveTextCrossModalMedias
+  rpc RetrieveSimilarMedias(RetrieveMediasRequest) returns (RetrieveMediasResponse); // @alias=/RetrieveSimilarMedias
+  rpc RetrieveFaces(RetrieveMediasRequest) returns (RetrieveFacesResponse); // @alias=/RetrieveFaces
+  rpc RetrieveConsistentMedias(RetrieveConsistentMediasRequest) returns (RetrieveConsistentMediasResponse); // @alias=/RetrieveConsistentMedias
+  rpc AssociateWords(AssociateWordsRequest) returns (AssociateWordsResponse); // @alias=/AssociateWords
+  rpc ExtractImages(ExtractImagesRequest) returns (ExtractImagesResponse); // @alias=/ExtractImages
+  // 资源包管理
+  rpc CreateResourcePackage(CreateResourcePackageRequest) returns (CreateResourcePackageResponse); // @alias=/CreateResourcePackage
+  rpc DeleteResourcePackage(DeleteResourcePackageRequest) returns (ResourcePackageOperateResponse); // @alias=/DeleteResourcePackage
+  rpc UpdateResourcePackage(UpdateResourcePackageRequest) returns (ResourcePackageOperateResponse); // @alias=/UpdateResourcePackage
+  rpc DescribeResourcePackage(DescribeResourcePackageRequest) returns (DescribePackageResponse); // @alias=/DescribeResourcePackage
+  rpc AddResourceToPackage(AddResourceToPackageRequest) returns (AddResourceToPackageResponse); // @alias=/AddResourceToPackage
+  rpc DeleteResourceFromPackage(DeleteResourceFromPackageRequest) returns (ResourcePackageOperateResponse); // @alias=/DeleteResourceFromPackage
+  rpc UndeleteResourceFromPackage(UndeleteResourceFromPackageRequest) returns (ResourcePackageOperateResponse); // @alias=/UndeleteResourceFromPackage
+
+  // 内部接口
+  rpc BindMedias(BindMediasRequest) returns (BindMediasResponse); // @alias=/BindMedias
+  rpc DescribeMediaDetailsInner(DescribeMediaDetailsInnerRequest) returns (DescribeMediaDetailsInnerResponse); // @alias=/DescribeMediaDetailsInner
+}

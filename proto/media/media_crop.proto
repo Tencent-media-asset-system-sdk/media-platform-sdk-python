@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package trpc.media.mediacrop;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/mediacrop";
+
+
+message CustomerStorageParam {
+	string MediaName = 1;
+	trpc.media.common.DomainGroupType DomainGroupType = 2;
+}
+
+message CropConversionParam {
+	string StartTime = 1;
+	string EndTime = 2;
+	CustomerStorageParam CustomerStorageParam = 3;
+}

@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+import "common.proto";
+package trpc.media.personretrieval;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/personretrieval";
+
+message CreatePersonRetrievalTaskRequest {
+  string MediaId = 1;
+  string TaskName = 2;
+  string CallbackURL = 3;
+}
+
+message CreatePersonRetrievalTaskResponse {
+  string TaskId = 2;
+}
+
+message StampInfo {
+  string StartTimeStamp = 1;
+  string EndTimeStamp = 2;
+}
+
+message DetailStampInfo {
+  string StartFrameIndex = 1;  //人脸出现起始帧号
+  string EndFrameIndex = 2;    //人脸出现的终止帧号
+  repeated FrameInfo DetailFrames = 3;   //人脸出现的位置信息
+}
+
+message FrameInfo {
+  trpc.media.common.Rect Rect = 1;
+  string FrameIndex     = 2;  // 人脸出现的帧号
+  float Quality     = 3;  //质量总分
+}
+
+message FaceInfo{
+  string Name = 1;
+  string Job = 2;
+  string Label = 3;
+  repeated StampInfo StampInfoSet = 4;
+  string ImageMediaId = 5;
+  string FaceId = 6;
+  int32 IsUnknown = 7;
+  bool PutLibraryAllowed = 8;
+  string SecondLabel = 9;
+  string AttachPersonId = 10;
+  repeated DetailStampInfo DetailStampInfoSet = 11;
+  int32 Sensitive = 12;
+  float Confidence = 13;
+}
+
+message PersonRetrievalTaskData {
+  repeated FaceInfo FaceInfoSet = 1;
+  uint32 TotalCount = 2;
+}
+
+message DescribePersonRetrievalTaskDataRequest {
+  string TaskId = 1;
+  repeated string NameSet = 2;
+}
+
+message DescribePersonRetrievalTaskDataResponse {
+  PersonRetrievalTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+  string WebMediaURL = 3;
+}
+
+message AppearMedia {
+  string MediaId = 1;
+  string BusinessMediaID = 2;
+  string MediaURL = 3;
+  repeated StampInfo StampInfoSet = 4;
+}
+
+message RetrievalImageFaces {
+  string Name = 1;
+  string Job = 2;
+  string Label = 3;
+  string SecondLabel = 4;
+  string ImageURL = 5;
+  string FaceId = 6;
+  int32 IsUnknown = 7;
+  bool PutLibraryAllowed = 8;
+  repeated AppearMedia AppearMediaSet = 9;
+  string AttachPersonId = 10;
+  trpc.media.common.Rect Rect = 11;
+  int32 Sensitive = 12;
+  float Quality = 13;
+  float Confidence = 14;
+  repeated string GroupIdSet = 15;
+}
+
+message RetrievalImageRequest {
+  bytes Image = 1;
+  bool IsUnknownGroupEnable = 2;
+  bool IsPublicGroupEnable = 3;
+  bool IsUserDefineGroupEnable = 4;
+  repeated uint32 UserDefineGroupSet = 5;
+  bool IsTimestampEnable = 6;
+  bool IsAppearMediaEnable = 7;
+  string LocalImagePath = 8;  // 内部使用
+}
+
+message RetrievalImageResponse {
+  repeated RetrievalImageFaces FaceSet = 1;
+  uint32 TotalCount = 2;
+}
+
+
+service PersonRetrieval {
+  rpc CreatePersonRetrievalTask(CreatePersonRetrievalTaskRequest) returns (CreatePersonRetrievalTaskResponse); // @alias=/CreatePersonRetrievalTask
+  rpc DescribePersonRetrievalTaskData(DescribePersonRetrievalTaskDataRequest) returns (DescribePersonRetrievalTaskDataResponse); // @alias=/DescribePersonRetrievalTaskData
+  rpc RetrievalImage(RetrievalImageRequest) returns (RetrievalImageResponse); // @alias=/RetrievalImage
+}

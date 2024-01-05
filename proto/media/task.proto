@@ -1,0 +1,255 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+import "common.proto";
+import "task_data.proto";
+
+
+package trpc.media.task;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/task";
+
+
+message TaskOperateResponse {
+  string TaskId = 1;
+  trpc.media.common.OperateResponse TaskOperateStatus = 2;
+}
+
+
+message DescribeSupportedMediaTypesRequest {
+}
+
+message DescribeSupportedMediaTypesResponse {
+  repeated trpc.media.common.MediaType MediaTypeSet = 1;
+}
+
+message CreateTaskRequest {
+  string MediaId = 1;
+  string TaskName = 2;
+  string CallbackURL = 3;
+  bool RunImmediately = 4;
+  google.protobuf.Struct Parameter = 5; // 可以接受任何 json 对应参数
+  string WorkflowTemplateId = 6;
+  string ParentTaskId = 7;
+  uint32 EffectiveTime = 8;
+}
+
+message CreateTaskResponse {
+  string TaskId = 1;
+}
+
+message DescribeTaskRequest {
+  string TaskId = 1;
+}
+
+message DescribeTaskResponse {
+  trpc.media.common.TaskInfo TaskInfo = 1;
+}
+
+
+message SortBy {
+  string By = 1;
+  bool Descend = 2;
+}
+
+
+message DescribeTasksRequest {
+  int32 PageNumber = 1;
+  int32 PageSize = 2;
+  repeated trpc.media.common.Filter FilterSet = 3;
+  SortBy Sort = 4;
+  trpc.media.common.DayRange CreateDayRange = 5;                      // 筛选创建时间区间
+}
+
+message DescribeTasksResponse {
+  repeated trpc.media.common.TaskInfo TaskInfoSet = 1;
+  uint32 TotalCount = 2;
+}
+
+message StartTaskRequest {
+  string TaskId = 1;
+  google.protobuf.Struct Parameter = 2; // 可以接受任何 json 对应参数
+  bool Top = 3; // 任务优先级是否置顶
+}
+
+message StartTaskResponse {
+}
+
+message StartTasksRequest {
+  repeated StartTaskRequest TaskSet = 1;
+}
+
+message StartTasksResponse {
+  repeated TaskOperateResponse OperateResponseSet = 1;
+}
+
+
+message StopTaskRequest {
+  string TaskId = 1;
+}
+
+message StopTaskResponse {
+}
+
+message StopTasksRequest {
+  repeated string TaskIdSet = 1;
+}
+
+message StopTasksResponse {
+  repeated TaskOperateResponse OperateResponseSet = 1;
+}
+
+
+message DeleteTaskRequest {
+  string TaskId = 1;
+}
+
+message DeleteTaskResponse {
+}
+
+message TopTaskRequest {
+  string TaskId = 1;
+}
+
+message TopTaskResponse {
+}
+
+message DescribeTaskDetailRequest {
+  string TaskId = 1;
+}
+
+message DescribeTaskDetailResponse {
+  trpc.media.common.TaskInfo TaskInfo = 1;
+  trpc.media.taskdata.AllTaskData TaskData = 2;
+}
+
+
+message DescribeWorkflowProgressRequest {
+  string TaskId = 1;
+}
+
+message DescribeWorkflowProgressResponse {
+  trpc.media.common.TaskInfo TaskInfo = 2;
+  repeated trpc.media.common.TaskInfo SubTaskInfoSet = 1;
+}
+
+message ModifyTaskDataRequest {
+  string TaskId = 1;
+  string JsonPath = 2;
+  string NewTag = 3;
+  bool ReviseRelatedData = 4;
+}
+
+message ModifyTaskDataResponse {
+}
+
+message CheckWorkflowTemplateRequest {
+  trpc.media.common.WorkflowTemplate WorkflowTemplate = 1;
+}
+
+message CheckWorkflowTemplateResponse {
+  bool Ok = 1;
+  string Reason = 2;
+}
+
+
+message DescribeTaskListFileRequest {
+  repeated string ApiModuleSet = 5;
+  trpc.media.common.TimeInterval TimeInterval = 6; 
+}
+
+message DescribeTaskListFileResponse {
+  string DownloadURL = 3;
+}
+
+
+message DescribeStatisticsRequest {
+  repeated string ApiModuleSet = 5;
+  trpc.media.common.TimeInterval TimeInterval = 6;
+}
+
+message Indicator {
+  string Name = 1;
+  string Value = 2;
+}
+
+message StatisticsData {
+  repeated Indicator MediaStatisticsSet = 1;
+  repeated Indicator ProcessStatisticsSet = 2;
+  repeated Indicator MediaDurationClassiedSet = 3;
+}
+
+message DescribeStatisticsResponse {
+  StatisticsData StatisticsData = 3;
+}
+
+
+message SnippetData {
+  float StartTime = 1;
+  float EndTime = 2;
+  repeated string SummarySet = 3;
+  repeated string TitleSet = 4;
+  repeated string AsrSet = 5;
+  repeated string SubTitleSet = 6;
+  repeated string FrameTagSet = 7;
+  repeated string TextTagSet = 8;
+}
+
+message DescribeTagAnalyseInputRequest {
+  string TaskId = 1;
+}
+
+message DescribeTagAnalyseInputResponse {
+  repeated SnippetData SnippetDataSet = 3;
+}
+
+service Task {
+  // 任务管理
+  rpc DescribeSupportedMediaTypes(DescribeSupportedMediaTypesRequest) returns (DescribeSupportedMediaTypesResponse); // @alias=/DescribeSupportedMediaTypes
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse); // @alias=/CreateTask
+  rpc DescribeTask(DescribeTaskRequest) returns (DescribeTaskResponse); // @alias=/DescribeTask
+  rpc DescribeTasks(DescribeTasksRequest) returns (DescribeTasksResponse); // @alias=/DescribeTasks
+  rpc StartTask(StartTaskRequest) returns (StartTaskResponse); // @alias=/StartTask
+  rpc StartTasks(StartTasksRequest) returns (StartTasksResponse); // @alias=/StartTasks
+  rpc StopTask(StopTaskRequest) returns (StopTaskResponse); // @alias=/StopTask
+  rpc StopTasks(StopTasksRequest) returns (StopTasksResponse); // @alias=/StopTasks
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse); // @alias=/DeleteTask
+  rpc TopTask(TopTaskRequest) returns (TopTaskResponse); // @alias=/TopTask
+  rpc DescribeTaskDetail(DescribeTaskDetailRequest) returns (DescribeTaskDetailResponse); // @alias=/DescribeTaskDetail
+  
+  // 标签修改
+  rpc ModifyTaskData(ModifyTaskDataRequest) returns (ModifyTaskDataResponse); // @alias=/ModifyTaskData
+  
+
+  // 数据统计相关
+  rpc DescribeTaskListFile(DescribeTaskListFileRequest) returns (DescribeTaskListFileResponse); // @alias=/DescribeTaskListFile
+  rpc DescribeStatistics(DescribeStatisticsRequest) returns (DescribeStatisticsResponse); // @alias=/DescribeStatistics
+
+  // workflow
+  rpc DescribeWorkflowProgress(DescribeWorkflowProgressRequest) returns (DescribeWorkflowProgressResponse); // @alias=/DescribeWorkflowProgress
+
+  
+  // 内部使用接口
+  rpc StopTasksInner(StopTasksRequest) returns (StopTasksResponse); // @alias=/StopTasksInner
+  rpc CheckWorkflowTemplate(CheckWorkflowTemplateRequest) returns (CheckWorkflowTemplateResponse); // @alias=/CheckWorkflowTemplate
+  
+  // 标签分析任务输入太大，不适合作为 ppl 参数传入，采用拉取方式
+  rpc DescribeTagAnalyseInput(DescribeTagAnalyseInputRequest) returns (DescribeTagAnalyseInputResponse); // @alias=/DescribeTagAnalyseInput
+}
+
+message FinishedTaskRequest {
+  string TaskId = 1;
+  string FLowId = 2;
+  trpc.media.common.TaskStatus TaskStatus = 3;
+  string FailedReason = 4;
+  string RequestId = 5;
+}
+
+message FinishedTaskResponse {
+  string RequestId = 1;
+  string Error = 2;
+}
+
+service TaskCallback {
+  rpc FinishedTask(FinishedTaskRequest) returns (FinishedTaskResponse); // @alias=/FinishedTask
+}

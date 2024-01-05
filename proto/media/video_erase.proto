@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+import "common.proto";
+import "video_structure.proto";
+package trpc.media.videoerase;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/videoerase";
+
+message LogoMask {
+  trpc.media.common.Rectf Location = 1;
+  string MaskType = 2;
+}
+
+
+message CreateRemoveLogoTaskRequest {
+  string MediaId = 1;
+  string TaskName = 4;
+  string CallbackURL = 5;
+}
+
+message CreateRemoveLogoTaskResponse {
+  string TaskId = 1;
+}
+
+message DescribeRemoveLogoTaskDataRequest {
+  string TaskId = 1;
+}
+
+message RemoveLogoTaskData {
+  string WebMediaURL = 1;
+  string MediaId = 2;
+  bool EnableDetect = 3;
+  repeated trpc.media.videostructure.ImageLogo LogoLocation = 4;
+  repeated trpc.media.videostructure.ImageOcr TvLocation = 5;
+  repeated LogoMask InputMask = 6;
+  string ExtraMsg = 7;
+  int32 MasksCount = 8;
+  float ResultVideoWidth = 9;
+  float ResultVideoHeight = 10;
+  string ResultVideoFormat = 11;
+  bool ResultVideoKeepAudio = 12;
+}
+
+message DescribeRemoveLogoTaskDataResponse {
+  RemoveLogoTaskData TaskData = 2;
+  trpc.media.common.TaskInfo TaskInfo = 3;
+  string WebMediaURL = 5;
+}
+
+
+message CreateRemoveCaptionTaskRequest {
+  string MediaId = 1;
+  string TaskName = 4;
+  string CallbackURL = 5;
+}
+
+message CreateRemoveCaptionTaskResponse {
+  string TaskId = 1;
+}
+
+message DescribeRemoveCaptionTaskDataRequest {
+  string TaskId = 1;
+}
+
+message RemoveCaptionTaskData {
+  string WebMediaURL = 1;
+  string MediaId = 2;
+  repeated LogoMask InputMask = 3;
+  string ExtraMsg = 4;
+  int32 MasksCount = 5;
+  float ResultVideoWidth = 6;
+  float ResultVideoHeight = 7;
+  string ResultVideoFormat = 8;
+  bool ResultVideoKeepAudio = 9;
+}
+
+message DescribeRemoveCaptionTaskDataResponse {
+  RemoveCaptionTaskData TaskData = 2;
+  trpc.media.common.TaskInfo TaskInfo = 3;
+  string WebMediaURL = 5;
+}
+
+
+service RemoveLogo {
+  rpc CreateRemoveLogoTask(CreateRemoveLogoTaskRequest) returns
+      (CreateRemoveLogoTaskResponse); //@alias=/CreateRemoveLogoTask
+  rpc DescribeRemoveLogoTaskData(DescribeRemoveLogoTaskDataRequest) returns
+      (DescribeRemoveLogoTaskDataResponse); //@alias=/DescribeRemoveLogoTaskData
+}
+
+service RemoveCaption {
+  rpc CreateRemoveCaptionTask(CreateRemoveCaptionTaskRequest) returns
+      (CreateRemoveCaptionTaskResponse); //@alias=/CreateRemoveCaptionTask
+  rpc DescribeRemoveCaptionTaskData(DescribeRemoveCaptionTaskDataRequest) returns
+      (DescribeRemoveCaptionTaskDataResponse); //@alias=/DescribeRemoveCaptionTaskData
+}

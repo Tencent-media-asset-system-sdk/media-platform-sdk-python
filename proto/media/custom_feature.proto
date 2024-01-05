@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+import "common.proto";
+package trpc.media.customfeature;
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/customfeature";
+
+message DescribeTextCategoriesRequest {
+  string ApiModule = 1;
+}
+
+message L2Label {
+  string LabelName = 2;
+}
+
+message L1Label {
+  string LabelName = 1;
+  repeated L2Label L2LabelSet = 2;
+}
+
+message DescribeTextCategoriesResponse {
+  repeated L1Label LabelSet = 1;
+}
+
+message CustomTextItem {
+  string TextId = 1;
+  string Text = 2;
+  string L1LabelName = 3;
+  string L2LabelName = 4;
+  string Blacked = 5;
+  string CreateTime = 6;
+  string EffectiveTime = 7;
+}
+
+message CreateCustomTextRequest {
+  string ApiModule = 1;
+  CustomTextItem CustomText = 2;
+}
+
+message CreateCustomTextResponse {
+  string TextId = 1;
+}
+
+message ModifyCustomTextRequest {
+  string ApiModule = 1;
+  CustomTextItem CustomText = 2;
+}
+
+message ModifyCustomTextResponse {
+  string TextId = 1;
+}
+
+message Filter {
+  string Name = 1;
+  repeated string Values = 2;
+}
+
+message SortBy {
+  string By = 1;
+  bool Descend = 2;
+}
+
+message DescribeCustomTextsRequest {
+  string ApiModule = 1;
+  uint32 PageNumber = 2;
+  uint32 PageSize = 3;
+  repeated Filter FilterSet = 4;
+  SortBy Sort = 5;
+}
+
+message DescribeCustomTextsResponse {
+  int32 TotalCount = 1;
+  repeated CustomTextItem CustomTextSet = 2;
+}
+
+message DescribeLastUpdateTimeRequest {
+  string ApiModule = 1;
+}
+
+message DescribeLastUpdateTimeResponse {
+  uint32 LastUpdateTimestamp = 1;
+}
+
+message DeleteCustomTextRequest {
+  string ApiModule = 1;
+  string TextId = 2;
+}
+
+message DeleteCustomTextResponse {
+  string TextId = 1;
+}
+
+message FeatureItem {
+  string FeatureId = 1;
+  enum FeatureTypeValue {
+    INVALID = 0;
+    INT4 = 1;
+    INT8 = 2;
+    INT32 = 3;
+    FLOAT32 = 4;
+    FLOAT64 = 5;
+  }
+  FeatureTypeValue FeatureType = 2;
+  uint32 FeatureDimension = 3;
+  string FeatureVersion = 4;
+  bytes FeatureBytes = 5;
+  string FeatureLabel = 6;
+  string CreateTime = 7;
+  string EffectiveTime = 8;
+}
+
+message CreateFeatureRequest {
+  string ApiModule = 1;
+  FeatureItem Feature = 2;
+}
+
+message CreateFeatureResponse {
+  string FeatureId = 1;
+}
+
+message ModifyFeatureRequest {
+  string ApiModule = 1;
+  FeatureItem Feature = 2;
+}
+
+message ModifyFeatureResponse {
+  string FeatureId = 1;
+}
+
+message DescribeFeaturesRequest {
+  string ApiModule = 1;
+  uint32 PageNumber = 2;
+  uint32 PageSize = 3;
+  repeated Filter FilterSet = 4;
+  SortBy Sort = 5;
+}
+
+message DescribeFeaturesResponse {
+  int32 TotalCount = 1;
+  repeated FeatureItem FeatureSet = 2;
+}
+
+message DeleteFeatureRequest {
+  string ApiModule = 1;
+  string FeatureId = 2;
+}
+
+message DeleteFeatureResponse {
+  string FeatureId = 1;
+}
+
+service CustomFeature {
+  // 自定义文本标签相关接口
+  rpc DescribeTextCategories(DescribeTextCategoriesRequest) returns (DescribeTextCategoriesResponse); // @alias=/DescribeTextCategories
+  rpc CreateCustomText(CreateCustomTextRequest) returns (CreateCustomTextResponse); // @alias=/CreateCustomText
+  rpc ModifyCustomText(ModifyCustomTextRequest) returns (ModifyCustomTextResponse); // @alias=/ModifyCustomText
+  rpc DescribeCustomTexts(DescribeCustomTextsRequest) returns (DescribeCustomTextsResponse); // @alias=/DescribeCustomTexts
+  rpc DescribeLastUpdateTime(DescribeLastUpdateTimeRequest) returns (DescribeLastUpdateTimeResponse); // @alias=/DescribeLastUpdateTime
+  rpc DeleteCustomText(DeleteCustomTextRequest) returns (DeleteCustomTextResponse); // @alias=/DeleteCustomText
+
+  // 特征相关接口
+  rpc CreateFeature(CreateFeatureRequest) returns (CreateFeatureResponse); // @alias=/CreateFeature
+  rpc ModifyFeature(ModifyFeatureRequest) returns (ModifyFeatureResponse); // @alias=/ModifyFeature
+  rpc DescribeFeatures(DescribeFeaturesRequest) returns (DescribeFeaturesResponse); // @alias=/DescribeFeatures
+  rpc DeleteFeature(DeleteFeatureRequest) returns (DeleteFeatureResponse); // @alias=/DeleteFeature
+}

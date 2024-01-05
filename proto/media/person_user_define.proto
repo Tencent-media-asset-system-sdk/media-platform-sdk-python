@@ -1,0 +1,295 @@
+syntax = "proto3";
+
+import "common.proto";
+package trpc.media.personuserdefine;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/personuserdefine";
+
+// 创建自定义人物库
+message CreateUserDefineGroupRequest {
+  string GroupName = 5;
+  string Description = 6;
+}
+
+message CreateUserDefineGroupResponse {
+  uint32 GroupID = 3;
+}
+
+// 查询自定义人物库
+message DescribeUserDefineGroupRequest {
+  SortBy SortBy = 5;
+}
+
+message UserDefineGroup {
+  uint32 GroupID = 1;
+  string GroupName = 2;
+  string Description = 3;
+  uint32 PersonCount = 4;
+  string UpdateTime = 5;
+  uint32 Status = 6;
+}
+
+message DescribeUserDefineGroupResponse {
+  string GroupID = 3; // 媒体AI引擎v2.2开始废弃
+  bool ExistFlag = 4; // 媒体AI引擎v2.2开始废弃
+  repeated UserDefineGroup UserDefineGroupSet = 5;
+  uint32 TotalCount = 6;
+}
+
+// 删除自定义人物库
+message RemoveUserDefineGroupRequest {
+  uint32 GroupID = 5;
+}
+
+message RemoveUserDefineGroupResponse {
+}
+
+// 更新自定义人物库
+message UpdateUserDefineGroupRequest {
+  uint32 GroupID = 5;
+  optional string GroupName = 6;
+  optional string Description = 7;
+  optional uint32 Status = 8;
+}
+
+message UpdateUserDefineGroupResponse {
+}
+
+// 创建自定义人物
+message CreateUserDefinePersonRequest {
+  repeated string MediaIdSet = 1;
+  string Name = 2;
+  string BasicInfo = 3;
+  string Tag1_1 = 4;
+  string Tag1_2 = 5;
+  string RequestId = 6;
+  string Uin = 7;
+  uint32 TIProjectID = 8;
+  uint32 TIBusinessID = 9;
+  repeated string MediaURLSet = 10;
+  uint32 GroupID = 11;
+  int32 Sensitive = 12;
+}
+
+message ImageCheckInfo {
+  string MediaId = 1;
+  int32 CheckCode = 2;
+  string CheckMsg = 3;
+  string MediaURL = 4;
+}
+
+message CreateUserDefinePersonResponse {
+  string PersonID = 3;
+  repeated ImageCheckInfo CheckInfo = 4;
+}
+
+// 删除自定义人物
+message RemoveUserDefinePersonRequest {
+  string PersonID = 1;
+}
+
+message RemoveUserDefinePersonResponse {
+}
+
+// 更新自定义人物的信息
+message UpdateUserDefinePersonRequest {
+  string PersonID = 1;
+  string Name = 2;
+  string BasicInfo = 3;
+  string Tag1_1 = 4;
+  string Tag1_2 = 5;
+  repeated string MediaIdSet = 6;
+  repeated string MediaURLSet = 11;
+  int32 Sensitive = 12;
+}
+
+message UpdateUserDefinePersonResponse {
+  string PersonID = 3;
+  repeated ImageCheckInfo CheckInfo = 4;
+}
+
+// 查询自定义人物
+message FilterBy {
+  string Name = 1;
+  repeated int32 Status = 2;
+  repeated string Tag1_1 = 3;
+  repeated string Tag1_2 = 4;
+  repeated int32 Sensitive = 5;
+}
+
+message SortBy {
+  string By = 1;
+  bool Desc = 2;
+}
+
+message DescribeUserDefinePersonRequest {
+  int32 PageNumber = 1;
+  int32 PageSize = 2;
+  FilterBy FilterBy = 3;
+  SortBy SortBy = 4;
+  optional uint32 GroupID = 9;
+}
+
+message PersonUserDefined {
+  string PersonID = 1;
+  string Name = 2;
+  string MediaId = 3;
+  string Url = 4;
+  string Tag1_1 = 5;
+  string Tag1_2 = 6;
+  string BasicInfo = 7;
+  int32  Status = 8;
+  string CreateTime = 9;
+  string MediaURL = 10;
+  uint32 GroupID = 11;
+  int32 Sensitive = 12;
+}
+
+message DescribeUserDefinePersonResponse {
+  int32 TotalCount = 2;
+  int32 RevertCount = 3;
+  repeated PersonUserDefined PersonInfo = 4;
+}
+
+message DescribeUserDefinePersonDetailRequest {
+  repeated string PersonID = 2;
+}
+
+message DescribeUserDefinePersonDetailResponse {
+  repeated PersonUserDefinedDetail Persons = 3;
+}
+
+message Media {
+  string MediaId = 1;
+  string MediaURL = 2;
+}
+
+message PersonUserDefinedDetail {
+  string PersonID = 1;
+  string Name = 2;
+  repeated Media Medias = 3;
+  string Tag1_1 = 4;
+  string Tag1_2 = 5;
+  string BasicInfo = 6;
+  int32  Status = 7;
+  string CreateTime = 8;
+  uint32 GroupID = 9;
+  int32 Sensitive = 10;
+}
+
+message CreatePersonCategoryRequest {
+  string Tag1_1 = 2;
+  string Tag1_2 = 3;
+}
+
+message CreatePersonCategoryResponse {
+}
+
+message RemovePersonCategoryRequest {
+  string Tag1_1 = 2;
+  string Tag1_2 = 3;
+}
+
+message RemovePersonCategoryResponse {
+}
+
+message DescribePersonCategoryRequest {
+}
+
+message DescribePersonCategoryResponse {
+  repeated PersonCategory Categories = 3;
+}
+
+message PersonCategory {
+  string Tag1_1 = 1;
+  string Tag1_2 = 2;
+}
+
+// 根据特征Id查询数据库中自定义人物
+// 1. 从hades查public_face_user_group_{$projectid}}_{$business_id}获取feature_id。
+// 2. 输入feature_id查询自定义人物信息。
+message DescribeUserDefinePersonWithFeatureRequest {
+  repeated string FeatureId = 2;
+}
+
+message DescribeUserDefinePersonWithFeatureResponse {
+  repeated PersonUserDefinedDetail Persons = 3;
+}
+
+/* 2022-07-15 将翻库模块接口合并到自定义人物库 */
+// 翻库动作
+message PersonRevertRequest {
+  string PersonID = 1;
+  repeated string TaskIdSet = 2;
+  string RequestId = 3;
+  string CallbackId = 7;
+  string CallbackUrl = 8;
+}
+
+message RevertTaskCheckInfo {
+  string TaskId = 1;
+  int32 CheckCode = 2;
+  string CheckMsg = 3;
+  string MediaId = 4;
+}
+
+message PersonRevertResponse  {
+  repeated RevertTaskCheckInfo CheckInfo = 3;
+}
+
+// 查询翻库的task
+message DescribeRevertTasksRequest {
+  string PersonID = 1;
+  bool isNeedKnownPerson = 6;
+}
+
+message RevertTaskInfo {
+  string TaskId = 1;
+  string TaskName = 2;
+  string AppID = 3;
+  string MediaId = 4;
+  string MediaURL = 5;
+}
+
+message DescribeRevertTasksResponse  {
+  repeated RevertTaskInfo TaskInfo = 3;
+  int32 TaskCount = 4;
+  PersonUserDefinedDetail ExplicitPersonInfo = 5;
+  string UnknownPersonID = 6;
+  repeated Media MediaSet = 7;
+  string RevertPersonID = 8;
+}
+
+// 回调的三元组信息，兼容2.7的协议
+message RevertCallBackInfo {
+  string CallbackId = 1;
+  string UnknownPersonID = 2;
+  PersonUserDefinedDetail ExplicitPersonInfo = 3;
+  repeated Media MediaSet = 4;
+  int32 MediaCount = 5;
+}
+
+service UserDefinePerson {
+  //自定义人物库
+  rpc CreateUserDefineGroup(CreateUserDefineGroupRequest) returns (CreateUserDefineGroupResponse); // @alias=/CreateUserDefineGroup
+  rpc DescribeUserDefineGroup(DescribeUserDefineGroupRequest) returns (DescribeUserDefineGroupResponse); // @alias=/DescribeUserDefineGroup
+  rpc RemoveUserDefineGroup(RemoveUserDefineGroupRequest) returns (RemoveUserDefineGroupResponse); // @alias=/RemoveUserDefineGroup
+  rpc UpdateUserDefineGroup(UpdateUserDefineGroupRequest) returns (UpdateUserDefineGroupResponse); // @alias=/UpdateUserDefineGroup
+
+  // 自定义人脸
+  rpc CreateUserDefinePerson(CreateUserDefinePersonRequest) returns (CreateUserDefinePersonResponse); // @alias=/CreateUserDefinePerson
+  rpc RemoveUserDefinePerson(RemoveUserDefinePersonRequest) returns (RemoveUserDefinePersonResponse); // @alias=/RemoveUserDefinePerson
+  rpc UpdateUserDefinePerson(UpdateUserDefinePersonRequest) returns (UpdateUserDefinePersonResponse); // @alias=/UpdateUserDefinePerson
+  rpc DescribeUserDefinePerson(DescribeUserDefinePersonRequest) returns (DescribeUserDefinePersonResponse); // @alias=/DescribeUserDefinePerson
+  rpc DescribeUserDefinePersonDetail(DescribeUserDefinePersonDetailRequest) returns (DescribeUserDefinePersonDetailResponse); // @alias=/DescribeUserDefinePersonDetail
+  rpc DescribeUserDefinePersonWithFeature(DescribeUserDefinePersonWithFeatureRequest) returns (DescribeUserDefinePersonWithFeatureResponse); // @alias=/DescribeUserDefinePersonWithFeature
+
+  // 人物分类
+  rpc CreatePersonCategory(CreatePersonCategoryRequest) returns (CreatePersonCategoryResponse); //@alias=/CreatePersonCategory
+  rpc RemovePersonCategory(RemovePersonCategoryRequest) returns (RemovePersonCategoryResponse); //@alias=/RemovePersonCategory
+  rpc DescribePersonCategory(DescribePersonCategoryRequest) returns (DescribePersonCategoryResponse); //@alias=/DescribePersonCategory
+
+  // 翻库
+  rpc RevertPerson(PersonRevertRequest) returns (PersonRevertResponse); // @alias=/RevertPerson
+  rpc DescribeRevertTasks(DescribeRevertTasksRequest) returns (DescribeRevertTasksResponse); // @alias=/DescribeRevertTasks
+}

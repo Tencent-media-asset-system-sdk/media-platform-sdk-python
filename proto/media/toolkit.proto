@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package trpc.media.toolkit;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/toolkit";
+
+enum ToolProviderType {
+  TOOL_PROVIDER_UNKNOWN = 0;  // 未知提供者
+  TOOL_PROVIDER_AIMEDIA = 1;  // 媒体中台工具
+  TOOL_PROVIDER_PCG = 2;      // PCG工具
+}
+
+enum ToolCategoryType {
+  TOOL_CATEGORY_UNKNOWN = 0;              // 未知分类
+  TOOL_CATEGORY_VIDEO_QUALITY = 1;        // 视频画质工具
+  TOOL_CATEGORY_VIDEO_UNDERSTANDING = 2;  // 视频理解工具
+}
+
+enum ToolAccessType {
+  TOOL_ACCESS_UNKNOWN = 0;  // 未知访问
+  TOOL_ACCESS_INTERNAL = 1; // 内部访问
+  TOOL_ACCESS_EXTERNAL = 2; // 外部访问
+}
+
+message ToolInfo {
+  string ToolID = 1;
+  string ToolName = 2;
+  string ToolDescription = 3;
+  string ToolIconURI = 4;
+  string ToolEntryURI = 5;
+  //ToolCategoryType ToolCategory = 6;
+  //ToolProviderType ToolProvider = 7;
+  ToolAccessType ToolAccess = 8;
+  int32 ToolOrder = 9;
+}
+
+message DescribeToolkitsRequest {
+  //uint32 PageNumber = 4;
+  //uint32 PageSize = 5;
+}
+
+message DescribeToolkitsResponse {
+  repeated ToolInfo ToolSet = 1;
+  //uint32 TotalCount = 2;
+}
+
+message ToolkitDefaultRequest {
+}
+
+message ToolkitDefaultResponse {
+}
+
+service Toolkit {
+  rpc DescribeToolkits(DescribeToolkitsRequest) returns (DescribeToolkitsResponse); // @alias=/DescribeToolkits
+
+  /*
+  // Unimplemented
+  rpc DescribeToolkitDetail(ToolkitDefaultRequest) returns (ToolkitDefaultResponse); // @alias=/DescribeToolkitDetail
+  rpc CreateToolkit(ToolkitDefaultRequest) returns (ToolkitDefaultResponse); // @alias=/CreateToolkit
+  rpc DestroyToolkit(ToolkitDefaultRequest) returns (ToolkitDefaultResponse); // @alias=/DestroyToolkit
+  */
+}
+

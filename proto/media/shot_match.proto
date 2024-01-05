@@ -1,0 +1,23 @@
+syntax = "proto3";
+package trpc.media.shotmatch;
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/shotmatch";
+
+/*
+message ShotMatchParameter {
+  repeated string SentenceSet = 1;
+  SummaryInfo Summary = 2;
+  repeated float TTSDurationSet = 3;
+  repeated ShotInfo ShotSet = 4;
+  // repeated TagInfo TagSet = 5;
+}
+*/
+
+message ShotMatchInfo {
+  repeated float ScoreSet = 1;
+}
+
+message ShotMatchTaskData {
+  repeated ShotMatchInfo MatchSet = 1;
+}
+
+

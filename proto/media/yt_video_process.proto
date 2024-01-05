@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+import "common.proto";
+
+package trpc.media.ytvideoprocess;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/ytvideoprocess";
+
+// CreateVideoProcessTask defines
+enum VideoProcessType {
+  YTProcessUnknown = 0;
+  YTSuperResolution = 2001; // 视频超分
+  YTVideoRepair = 2002; // 老片修复
+  YTVideoTranscode = 2003; // 暂未支持
+  YTVideoCrop = 2004; // 暂未支持
+}
+
+message VideoProcessOption {
+  string OutputVideoCodec = 1; // 输出视频的格式，可选项{h264,h265,vp9,prores}，默认值为h264
+  int32 OutputVideoPeakBitrate = 2; // 峰值码率设置，单位Kbps，默认值为0，表示不开启该设置
+  int32 OutputWidth = 3; // 输出视频的高度值，默认值为0，表示不指定输出高度值，需同时指定output_height与output_width才能开启该功能
+  int32 OutputHeight = 4; // 输出视频的宽度值，默认值为0，表示不指定输出宽度值
+  int32 SR = 5; // 是否开启超分辨率功能，0表示关闭，1表示开启性能模式，2表示开启超分效果模式，3表示开启老片修复效果模式，默认值为0
+  int32 Interp = 6; // 倍帧帧率（整数），0或1表示维持原始视频帧率
+  int32 OutputFps = 7; // 指定输出的帧率（整数或者浮点数），0表示使用原视频帧率，output_fps与interp同时开启时，output_fps值无效
+  int32 ColorEnhanceLevel = 8; // 是否开启色彩增强功能，0表示关闭，增强等级可选值（整数）[1-10]
+
+  //int32 Descratch = 21; // [deprecated] 是否开启去划痕功能，0表示关闭，1表示开启，默认值为0
+  int32 DescratchGray = 22; // 是否开启亮度去划痕功能，0表示关闭，1表示开启，默认值为0
+  int32 DescratchColor = 23; // 是否开启色度去划痕功能，0表示关闭，1表示开启，默认值为0
+  int32 FaceEnhance = 24; // 是否开启人像增强功能，0表示关闭，1表示开启，默认值为0
+  int32 LargeFaceMode = 25; // 是否对大人脸做增强，0表示关闭，1表示开启，默认值为0
+  int32 SmallFaceMode = 26; // 是否对小人脸做增强，0表示关闭，1表示开启，默认值为0
+  int32 RefColorize = 27; // 是否开启视频参考帧上色功能，0表示关闭，1表示开启，默认值为0
+  string RefColorizeImg = 28; // [reserved] 开启视频上色时，参考帧的文件位置，需指定文件位置才能开启上色功能
+  float DehazeLevel = 29; // 视频去雾强度，取值为0-1之间的浮点数，0为关闭视频去雾功能
+
+  int32 SDR2HDR = 41; // 是否开启SDR2HDR功能，0表示关闭，1表示开启，默认值为0
+  string HDRType = 42; // SDR2HDR功能开启时，选择的HDR类型，可选项{pq,hlg}，默认值为pq
+}
+
+message CreateVideoProcessTaskRequest {
+  string MediaId = 2; // POC环境仅使用MediaId, MediaURL/LocalMediaPath未使用
+  string TaskName = 5;
+  string CallbackURL = 6;
+  VideoProcessType ProcessType = 11;
+  VideoProcessOption ProcessOption = 12; // 视频处理选项
+}
+
+message CreateVideoProcessResponse {
+  string TaskId = 3;
+}
+
+// DescribeVideoProcessDetail defines
+message VideoDetail {
+  int32 VideoID = 1; // 原视频ID
+  string VideoURL = 2; // 原视频URL地址
+  string VideoWebURL = 3; // 原视频Web预览地址
+  int32 Height = 4; // 纵向分辨率
+  int32 Width = 5; // 横向分辨率
+  float FPS = 6; // fps
+  float BitRate = 7; // 码率bps, bit per second
+  float Size = 8; // 大小，单位MB
+  float VMAF = 9; // VMAF
+  float PSNR = 10; // PSNR
+  float SSIM = 11; // SSIM
+  float LPIPS = 12; // LPIPS
+  string ImageUrl = 13; // 视频封面图片地址
+  int32 BandWidth = 15;
+  string VideoCodec = 16;
+}
+
+message VideoProcessTaskDetail {
+  //VideoDetail SourceVideoDetail = 1; // [deprecated] 原视频详细结果
+  //VideoDetail TargetVideoDetail = 2; // [deprecated] 结果视频详细结果
+  string SourceMediaId = 3; // 原视频媒体ID
+  string TargetMediaId = 4; // 结果视频媒体ID
+}
+
+message DescribeVideoProcessDetailRequest {
+  string TaskId = 2;
+}
+
+message DescribeVideoProcessDetailResponse {
+  trpc.media.common.TaskInfo TaskInfo = 3;
+  VideoProcessTaskDetail TaskDetail = 4;
+  VideoProcessOption ProcessOption = 5;
+}
+
+// StopVideoProcessTask defines
+message StopVideoProcessTaskRequest {
+  string TaskId = 2;
+}
+
+message StopVideoProcessTaskResponse {
+  string TaskId = 3;
+}
+
+// UpdateVideoProcessTask defines
+message UpdateVideoProcessTaskRequest {
+  string MediaId = 2;
+  string TaskId = 3;
+
+  VideoProcessOption ProcessOption = 11; // 视频处理选项
+  bool AutoStart = 12;
+  string ImageId = 13; // 图片ID
+}
+
+message UpdateVideoProcessResponse {
+  string TaskId = 3;
+}
+
+// interface defines
+service YTVideoProcess {
+  // 创建视频处理任务
+  rpc CreateVideoProcessTask(CreateVideoProcessTaskRequest) returns (CreateVideoProcessResponse); // @alias=/CreateVideoProcessTask
+  // 获取视频处理详情
+  rpc DescribeVideoProcessDetail(DescribeVideoProcessDetailRequest) returns (DescribeVideoProcessDetailResponse); //@alias=/DescribeVideoProcessDetail
+  // 更新视频处理任务
+  rpc UpdateVideoProcessTask(UpdateVideoProcessTaskRequest) returns (UpdateVideoProcessResponse); // @alias=/UpdateVideoProcessTask
+
+  // 停止任务，内部使用对外不暴露
+  rpc StopVideoProcessTask(StopVideoProcessTaskRequest) returns (StopVideoProcessTaskResponse); //@alias=/StopVideoProcessTask
+}

@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+import "common.proto";
+
+package trpc.media.workflowtemplate;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/workflowtemplate";
+
+// 操作状态
+message WorkflowTemplateOperateResponse {
+  string WorkflowTemplateId = 1;                                     // 模板Id
+  trpc.media.common.OperateResponse OperateResponse = 2;       // 操作结果
+}
+
+// 模板元信息
+message WorkflowTemplateMetaInfo {
+  string WorkflowTemplateName = 1;                                 // 工作流模板名称
+  trpc.media.common.MediaType MediaType = 2;                 // 资源类型
+  string WorkflowTemplateDescription = 3;                          // 工作流模板描述信息
+  bool IsDefaultProcess = 4;                                       // 是否为缺省流程
+}
+
+// 模板信息
+message WorkflowTemplateInfo {
+  WorkflowTemplateMetaInfo WorkflowTemplateMetaInfo = 1;                      // 模板元信息
+  trpc.media.common.WorkflowTemplate WorkflowTemplateContent = 2;     // 工作流模板的内容
+  trpc.media.common.DomainGroupInfo DomainGroupInfo = 3;              // 群组信息: 私有/公共/群组
+}
+
+// ====================================== 创建模板 ======================================
+message CreateWorkflowTemplatesRequest {
+  repeated WorkflowTemplateInfo WorkflowTemplateInfoSet = 1;
+}
+
+message CreateWorkflowTemplatesOperateResponse {
+  string WorkflowTemplateName = 1;                                  // 工作流模板名称
+  string  WorkflowTemplateId = 2;                                   // 模板Id
+  trpc.media.common.OperateResponse OperateResponse = 3;      // 模板的操作结果
+}
+
+message CreateWorkflowTemplatesResponse {
+  repeated CreateWorkflowTemplatesOperateResponse WorkflowTemplateOperateResponseSet = 1;
+}
+
+// ====================================== 查询模板 ======================================
+message DescribeWorkflowTemplatesRequest {
+  uint32 PageNumber = 1;                                            // 分页Id
+  uint32 PageSize = 2;                                              // 分页的大小
+  repeated trpc.media.common.Filter FilterSet = 3;            // 过滤条件
+  repeated trpc.media.common.Sorter SorterSet = 4;            // 排序条件
+}
+
+message WorkflowTemplateObject {
+  string  WorkflowTemplateId = 1;                                              // 模板Id
+  trpc.media.common.WorkflowTemplateStatus  WorkflowTemplateStatus = 2;  // 模板状态
+  WorkflowTemplateInfo WorkflowTemplateInfo = 3 ;                              // 模板信息
+  trpc.media.common.UserInfo CreateUserInfo = 4;                         // 模板的创建者信息
+  trpc.media.common.UserInfo ModifyUserInfo = 5;                         // 模板的修改者信息
+  string WorkflowTemplateCreateTime = 6;                                       // 模板创建时间
+  string WorkflowTemplateModifyTime = 7;                                       // 模板修改时间
+}
+
+message DescribeWorkflowTemplatesResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated WorkflowTemplateObject WorkflowTemplateObjectSet = 2;    // 返回的模板信息
+  uint32 TotalCount = 3;                                            // 返回的模板个数
+}
+
+// ====================================== 查询模板详情 ======================================
+message DescribeWorkflowTemplateDetailsRequest {
+  repeated string WorkflowTemplateIdSet = 1;                        // 模板Id
+}
+
+message DescribeWorkflowTemplateDetailsResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated WorkflowTemplateObject WorkflowTemplateObjectSet = 2;   // 返回的模板信息
+  uint32 TotalCount = 3;                                           // 返回的模板个数
+}
+
+// ====================================== 删除模板 ======================================
+message DeleteWorkflowTemplatesRequest {
+  trpc.media.common.Deleter Deleter = 1;                    //删除类型
+}
+
+message DeleteWorkflowTemplatesResponse {
+  repeated WorkflowTemplateOperateResponse WorkflowTemplateOperateResponseSet = 1;
+}
+
+// ====================================== 修改模板 ======================================
+message ModifyWorkflowTemplateRequest {
+  string  WorkflowTemplateId = 1;                                             // 模板Id
+  trpc.media.common.WorkflowTemplateStatus  WorkflowTemplateStatus = 2; // 修改后模板状态
+  WorkflowTemplateInfo WorkflowTemplateInfo = 3 ;                             // 修改后模板信息
+  bool EmptyReplace = 4;                                                      // 是否进行空值替换
+}
+
+message ModifyWorkflowTemplateResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+}
+
+// ====================================== 查询可用的模板组件 ======================================
+message DescribeAvailableWorkflowTemplateComponentsRequest {
+  string  WorkflowTemplateId = 1;                                             // 要查询的模板Id
+  trpc.media.common.MediaType  MediaType = 2;                           // 要查询的资源类型，1.0用这个查询
+}
+
+message DescribeAvailableWorkflowTemplateComponentsResponse {
+  trpc.media.common.OperateResponse OperateResponse = 1;
+  repeated trpc.media.common.TaskTemplate TaskTemplateSet = 2;          // 返回的可用组件信息
+  uint32 TotalCount = 3;                                                      // 返回的可用ApiModule的个数
+}
+
+service WorkflowTemplate {
+  // 工作流模板管理
+  rpc CreateWorkflowTemplates(CreateWorkflowTemplatesRequest) returns(CreateWorkflowTemplatesResponse); // @alias=/CreateWorkflowTemplates
+  rpc DescribeWorkflowTemplates(DescribeWorkflowTemplatesRequest) returns(DescribeWorkflowTemplatesResponse); // @alias=/DescribeWorkflowTemplates
+  rpc DescribeWorkflowTemplateDetails(DescribeWorkflowTemplateDetailsRequest) returns(DescribeWorkflowTemplateDetailsResponse); // @alias=/DescribeWorkflowTemplateDetails
+  rpc DeleteWorkflowTemplates(DeleteWorkflowTemplatesRequest) returns(DeleteWorkflowTemplatesResponse); // @alias=/DeleteWorkflowTemplates
+  rpc ModifyWorkflowTemplate(ModifyWorkflowTemplateRequest) returns(ModifyWorkflowTemplateResponse); // @alias=/ModifyWorkflowTemplate
+  rpc DescribeAvailableWorkflowTemplateComponents(DescribeAvailableWorkflowTemplateComponentsRequest) returns(DescribeAvailableWorkflowTemplateComponentsResponse); // @alias=/DescribeAvailableWorkflowTemplateComponents
+}

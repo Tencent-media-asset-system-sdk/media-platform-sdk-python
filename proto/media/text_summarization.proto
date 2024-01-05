@@ -1,0 +1,20 @@
+syntax = "proto3";
+package trpc.media.textsummarization;
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/textsummarization";
+
+
+message Sentence {
+  string Text = 1;
+  repeated string Keywords = 2;
+  repeated float PositionPercentages = 3;
+}
+
+
+message TextSummarizationTaskData {
+  string Summary = 1;
+  string Title = 2;
+  repeated Sentence Sentences = 3;
+  repeated string Keywords = 4;
+}
+
+

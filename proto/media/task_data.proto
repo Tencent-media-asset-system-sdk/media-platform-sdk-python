@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+
+import "ai_video_process.proto";
+import "yt_video_process.proto";
+import "video_structure.proto";
+import "video_erase.proto";
+import "video_quality_evaluation.proto";
+import "person_retrieval.proto";
+import "text_summarization.proto";
+import "shot_match.proto";
+import "video_cut.proto";
+import "google/protobuf/struct.proto";
+
+package trpc.media.taskdata;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/taskdata";
+
+
+message IVLDTaskData {
+  trpc.media.videostructure.AITagTaskData VideoTaskData = 1;
+  trpc.media.videostructure.AITagImageTaskData ImageTaskData = 2;
+  trpc.media.videostructure.AITagAudioTaskData AudioTaskData = 3;
+  trpc.media.videostructure.AITagTextTaskData TextTaskData = 4;
+}
+
+message ResizeTaskData {
+  string OutputMediaId = 1;
+}
+
+message IVSCTaskData {
+  repeated string OutputMediaId = 1;
+}
+
+message CropTaskData {
+  string MediaId = 1;
+  string TempDownloadURL = 2;
+}
+
+message TTSTaskData {
+  string MediaId = 1;
+  float AudioDuration = 2;
+}
+
+message ASRTaskData {
+  int64 ASRTaskID = 1;
+  string Result = 2;
+  google.protobuf.Struct ResultDetail = 3;
+  google.protobuf.Struct AudioQualityDetail = 4;
+}
+
+message AllTaskData {
+  IVLDTaskData IVLDTaskData = 1;
+  trpc.media.videostructure.AICutTaskData IVSSTaskData = 2;
+  trpc.media.videostructure.AICatalogTaskData IVCLTaskData = 3;
+  trpc.media.ytvideoprocess.VideoProcessTaskDetail IVSRTaskData = 4;
+  trpc.media.aivideoprocess.AIVideoProcessTaskDetail IVROTTaskData = 5;
+  trpc.media.videoerase.RemoveLogoTaskData IVLETaskData = 6;
+  trpc.media.videoerase.RemoveCaptionTaskData IVCETaskData = 7;
+  trpc.media.videoquality.QualityEvaluationInfo IVQITaskData = 8;
+  trpc.media.personretrieval.PersonRetrievalTaskData IVFCTaskData = 9;
+  IVSCTaskData IVSCTaskData = 10;
+  CropTaskData CropTaskData = 11;
+  ResizeTaskData ResizeTaskData = 12;
+  trpc.media.textsummarization.TextSummarizationTaskData TextSummarizationTaskData = 13;
+  trpc.media.shotmatch.ShotMatchTaskData ShotMatchTaskData = 14;
+  trpc.media.videocut.VideoCutTaskData VideoCutTaskData = 15;
+  TTSTaskData TTSTaskData = 16;
+  ASRTaskData ASRTaskData = 17;
+}

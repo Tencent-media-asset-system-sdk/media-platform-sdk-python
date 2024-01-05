@@ -1,0 +1,18 @@
+syntax = "proto3";
+package trpc.media.videocut;
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/videocut";
+
+message VideoCutTaskData {
+  int32  VideocutSize = 4;
+  repeated VideoCutItem VideocutItems = 5;
+}
+
+message VideoCutItem {
+  string VideocutType = 1; // 切片类型
+  int32 HeadIndex = 2;     // 镜头起始帧
+  int32 TailIndex = 3;     // 镜头终止帧
+  float StartTime = 4;     // 镜头起始时间
+  float EndTime = 5;       // 镜头终止时间
+}
+
+

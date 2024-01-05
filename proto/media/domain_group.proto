@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package trpc.media.domaingroup;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/media/domaingroup";
+
+message CreateDomainGroupRequest {
+    string DomainGroupDescription = 1;     // 群组简介
+  }
+  
+  message CreateDomainGroupResponse {
+    trpc.media.common.OperateResponse OperateResponse = 1;
+    string DomainGroupId = 2;              // 返回的群组Id
+  }
+  
+  message DescribeDomainGroupsRequest {
+    uint32 PageNumber = 1;                 // 分页Id
+    uint32 PageSize = 2;                   // 分页的大小
+    repeated trpc.media.common.Sorter SorterSet = 3;         // 排序条件
+  }
+  
+  message DoaminGroupObject {
+    string DomainGroupId = 1;                       // 群组Id
+    string DomainGroupDescription = 2;              // 群组描述
+    uint32 DoaminGroupMediaCount = 3;               // 群组下的资源个数
+    repeated string DoaminGroupMediaIdSet = 4;      // 群组下的资源Id集合
+    string DoaminGroupCreateTime = 5;               // 群组创建时间
+    string DoaminGroupModifyTime = 6;               // 群组修改时间
+    trpc.media.common.UserInfo CreateUserInfo = 7;                    // 群组的创建者信息
+    trpc.media.common.UserInfo ModifyUserInfo = 8;                    // 群组的修改者信息
+  }
+  
+  message DescribeDomainGroupsResponse {
+    trpc.media.common.OperateResponse OperateResponse = 1;
+    repeated DoaminGroupObject DoaminGroupObjectSet = 2;              // 返回的群组信息
+  }
+  
+  message DescribeDomainGroupDetailsRequest {
+    repeated string DomainGroupIdSet = 1;           // 群组Id
+  }
+  
+  message DescribeDomainGroupDetailsResponse {
+    trpc.media.common.OperateResponse OperateResponse = 1;
+    repeated DoaminGroupObject DoaminGroupObjectSet = 2;              // 返回的群组信息
+  }
+  
+  message AddMediasToDomainGroupsRequest {
+    repeated string MediaIdSet = 1;         // 资源Id集合
+    repeated string DomainGroupIdSet = 4;   // 群组集合
+  }
+  
+  message AddMediasToDomainGroupsResponse {
+    trpc.media.common.OperateResponse OperateResponse = 1;
+  }
+  
+  message RemoveMediasFromDomainGroupsRequest {
+    repeated string MediaIdSet = 1;         // 资源Id集合
+    repeated string DomainGroupIdSet = 4;   // 群组集合
+  }
+  
+  message RemoveMediasFromDomainGroupsResponse {
+    trpc.media.common.OperateResponse OperateResponse = 1;
+  }
+  
+  message DeleteDomainGroupsRequest {
+    trpc.media.common.Deleter Deleter = 1; //删除类型
+  }
+  
+  message DomainGroupOperateResponse {
+    string DomainGroupId = 1;               // 群组Id
+    trpc.media.common.OperateResponse OperateResponse = 2;
+  }
+  
+  message DeleteDomainGroupsResponse {
+    repeated DomainGroupOperateResponse DomainGroupOperateResponse = 1;
+  }
+  
+  message ModifyDomainGroupRequest {
+    string MediaId = 1;                     // 资源Id
+    string DomainGroupDescription = 2;      // 修改后的群组描述
+  }
+  
+  message ModifyDomainGroupResponse {
+    trpc.media.common.OperateResponse OperateResponse = 1;
+  }
+
+service DomainGroup {
+  // 群组管理
+  rpc CreateDomainGroup(CreateDomainGroupRequest) returns (CreateDomainGroupResponse); // @alias=/CreateDomainGroup
+  rpc DescribeDomainGroups(DescribeDomainGroupsRequest) returns (DescribeDomainGroupsResponse); // @alias=/DescribeDomainGroups
+  rpc DescribeDomainGroupDetails(DescribeDomainGroupDetailsRequest) returns (DescribeDomainGroupDetailsResponse); // @alias=/DescribeDomainGroupDetails
+  rpc AddMediasToDomainGroups(AddMediasToDomainGroupsRequest) returns (AddMediasToDomainGroupsResponse); // @alias=/AddMediasToDomainGroups
+  rpc RemoveMediasFromDomainGroups(RemoveMediasFromDomainGroupsRequest) returns (RemoveMediasFromDomainGroupsResponse); // @alias=/RemoveMediasFromDomainGroups
+  rpc DeleteDomainGroups(DeleteDomainGroupsRequest) returns (DeleteDomainGroupsResponse); // @alias=/DeleteDomainGroups
+  rpc ModifyDomainGroup(ModifyDomainGroupRequest) returns (ModifyDomainGroupResponse); // @alias=/ModifyDomainGroup
+}

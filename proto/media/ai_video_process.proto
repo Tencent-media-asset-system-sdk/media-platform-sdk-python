@@ -1,0 +1,281 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
+import "common.proto";
+
+package trpc.media.aivideoprocess;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/aivideoprocess";
+
+enum VideoProcessType {
+  AIUnknown = 0;
+  AISuperResolution = 1000;
+  AICodec = 1001;
+  AIOldRepair = 1002;
+  AITranscode = 1003;
+  AICrop = 1004;
+}
+
+enum PriorityLevel {
+  PriorityMin = 0;
+  PriorityLow = 10;
+  PriorityNormal = 20;
+  PriorityHigh = 30;
+  PriorityMax = 99;
+}
+
+message CommonProcessOption {
+  string OutputVideoCodec = 1;// 输出视频编码格式，可选，字符串，"avc1"(264) "hvc1"(265) "vp9"等 默认"avc1"
+}
+
+message VideoRepairOption {
+  string TemporalDenoise = 1; //时域降噪，可选， ["auto", "off", "on"] 默认auto
+  string ArtifactRemoval = 2; // 去压缩失真设置，可选，["off", "on", "auto"], 默认auto
+  string Sharpen = 3; // 细节增强, 可选，["off", "on"], 默认on
+  int32 SharpenLevel = 4; // 细节增强强度, 可选, [-1, 10], 默认-1,代表自动选择强度，0-10代表强度，数值越大，强度越大
+  string LumaDescratch = 5; //亮度去划痕，可选， ["auto", "off", "dense"，"sparse"] 默认off, dense为重划痕模型，sparse为轻划痕模型
+  string ChromaDescratch = 6; //色彩去划痕，可选， ["auto", "off", "dense"，"sparse"] 默认off
+}
+
+message SuperResolutionOption {
+  string Reserved = 1; // 预留字段
+}
+
+message VideoProcessOption {
+  int32 LuminanceColorEnhanceLevel = 1; // 亮度和色彩增强参数，0-10
+  int32 SDR2HDR = 2; // SDR转HDR开关，0-1
+  int32 FrameRate = 3; // 帧数1-120，0为原视频帧率
+  string HDRScheme = 4; // SDR转HDR的方案的选择，可选，字符串，["HDR10"、"HLG"]，默认HLG
+  int32 OutputWidth = 5; // 输出视频的高
+  int32 OutputHeight = 6; // 输出视频的宽
+  string OutputVideoCodec = 7;// 输出视频编码格式，可选，字符串，"avc1"(264) "hvc1"(265) "vp9"等 默认avc1
+  string SR = 8; // 超分设置, 可选，["auto", "srnet", "vsrnet", "ytsrnet", "off"] 默认auto
+  string FRUC = 9; // 倍帧开关, 可选，["off", "on", "auto"], 默认auto
+  int32 FRUCFPSRatio = 10; // 倍帧帧率, 可选, 正整数, 0-10
+  string OutputResolutionScheme = 11; // 输出分辨率策略, 可选, ["width_height"， "long_short_side"], 默认width_height
+  int32 OutputVideoLongSide = 12;  // 输出视频的长边，可选，取值范围[0, 7680]，必须为偶数。默认与输入视频的长边保持一致
+  int32 OutputVideoShortSide = 13; // 输出视频的短边，可选，取值范围[0, 4320]，必须为偶数。默认与输入视频的短边保持一致
+  // 设置是否使用padding(加黑边)的形式来保证输出内容的宽高比不变, 可选，["auto", "off"], 默认auto
+  string OutputPadding = 14;
+  int32 OutputVideoPeakBitrate = 15; // 输出视频的峰值码率，可选，范围[10, 200000]，单位Kbps，默认不设置峰值码率
+  int32 OutputVideoMaxAvgBitrate = 16; // 输出视频最大平均码率，可选，范围[10，200000]，单位Kbps，默认输入视频码率
+  string VSRNetModelType = 17; // 模型类别设置, 可选，["lq", "hq"], 默认hq
+  int32 HDRPreset = 18; // SDR转HDR的色彩和对比度方案, 可选值为[0,3]
+
+  string TemporalDenoise = 21; //时域降噪，可选， ["auto", "off", "on"] 默认auto
+  string ArtifactRemoval = 22; // 去压缩失真设置，可选，["off", "on", "auto"], 默认auto
+  string Sharpen = 23; // 细节增强, 可选，["off", "on"], 默认on
+  int32 SharpenLevel = 24; // 细节增强强度, 可选, [-1, 10], 默认-1,代表自动选择强度，0-10代表强度，数值越大，强度越大
+  string LumaDescratch = 25; //亮度去划痕，可选， ["auto", "off", "dense"，"sparse"] 默认off, dense为重划痕模型，sparse为轻划痕模型
+  string ChromaDescratch = 26; //色彩去划痕，可选， ["auto", "off", "dense"，"sparse"] 默认off
+
+  // 横竖屏选项
+  repeated int32 OutputRatios = 31; // [9, 16]
+  bool OutputWithCaptionDetect = 32; // true
+}
+
+message AIVideoDetail {
+  string MediaId = 1; // 原视频ID
+  string VideoURL = 2; // 原视频URL地址
+  string VideoWebURL = 3; // 原视频Web预览地址
+  int32 Height = 4; // 纵向分辨率
+  int32 Width = 5; // 横向分辨率
+  float FPS = 6; // fps
+  float BitRate = 7; // 码率bps, bit per second
+  float Size = 8; // 大小，单位MB
+  float VMAF = 9; // VMAF
+  float PSNR = 10; // PSNR
+  float SSIM = 11; // SSIM
+  float LPIPS = 12; // LPIPS
+  string ImageUrl = 13; // 视频封面图片地址
+  string M3UCOSPath = 14;
+  int32 BandWidth = 15;
+  string VideoCodec = 16;
+}
+
+message AIVideoProcessTaskDetail {
+  AIVideoDetail SourceVideoDetail = 1; // 原视频详细结果
+  AIVideoDetail TargetVideoDetail = 2; // 转换后的视频的详细结果
+}
+
+message COSConfig {
+   string Bucket = 1;
+   string Region = 2;
+   string SecretId = 3;
+   string SecretKey = 4;
+}
+
+message CreateAIVideoProcessTaskRequest {
+  string MediaId = 1;
+  string TaskName = 4;
+  string CallbackURL = 5;
+  VideoProcessType ProcessType = 8;
+  VideoProcessOption VideoProcessOption = 9; // 视频处理参数
+  string InputCOSPath = 12;
+  string OutputCOSDirectory = 13;
+  COSConfig CosConfig = 14;
+  int32 TaskPriority = 15;
+}
+
+message CreateAIVideoProcessResponse {
+  string TaskId = 2;
+  google.protobuf.Any TaskData = 4;
+}
+
+message DescribeAIVideoProcessTasksRequest {
+  int32 PageNumber = 1;
+  int32 PageSize = 2;
+  FilterBy FilterBy = 3;
+  SortBy SortBy = 4;
+}
+
+message DescribeAIVideoProcessTasksResponse {
+  int32 TotalCount = 2;
+  repeated AIVideoProcessTaskInfo TaskInfoSet = 3;
+}
+
+message AIVideoProcessTaskInfo {
+  string TaskId = 1;
+  string TaskName = 2;
+  string AppId = 3;
+  string MediaId = 4;
+  string TasktStatus = 5;
+  float TaskProgress = 6;
+  string TaskTimeCost = 7;
+  string TaskStartTime = 8;
+  string TaskCreateTime = 9;
+  string VideoName = 10;
+  string VideoType = 11;
+  string ShotImageUrl = 12; // 仅对样例视频库有用，直接数据库插入
+  string FailedReason = 13;
+  int32 TaskPriority = 14;
+}
+
+message FilterBy {
+  repeated string TaskMediaTypeSet = 1;
+  repeated string TaskStatusSet = 2;
+  repeated string AppIDSet = 3;
+  string Reason = 4;
+  string TaskNameOrID = 5;
+}
+
+message SortBy {
+  string By = 1;
+  string Order = 2;
+}
+
+message DescribeAIVideoProcessDetailRequest {
+  string TaskId = 1;
+}
+
+message DescribeAIVideoProcessDetailResponse {
+  trpc.media.common.TaskInfo TaskInfo = 1;
+  AIVideoProcessTaskDetail TaskDetail = 2;
+  VideoProcessOption ProcessOption = 3;
+}
+
+message StopAIVideoProcessTaskReq {
+  string TaskId = 1;
+}
+
+message StopAIVideoProcessTaskRsp {
+}
+
+message RemoveAIVideoProcessTaskReq {
+  string TaskId = 1;
+
+}
+
+message RemoveAIVideoProcessTaskRsp {
+
+}
+
+message HLSIndexInfo {
+  int32 Width = 1;
+  int32 Height = 2;
+  int32 BandWidth = 3;
+  string CosIndexFilePath = 4;
+}
+
+message CreateM3UIndexTaskRequest {
+  string TaskName = 2;
+  repeated HLSIndexInfo InputIndex = 3;
+  COSConfig CosConfig = 4;
+  string CosDestination = 5;
+  int32 TaskPriority = 9;
+}
+
+message CreateM3UIndexTaskResponse {
+  string TaskId = 2;
+}
+
+message DescribeM3UIndexDetailRequest {
+  string TaskId = 1;
+}
+
+message M3UIndexTaskInfo {
+    string TaskId = 1;
+    string TaskName = 2;
+    string TaskStatus = 3;
+    string FailedReason = 4;
+}
+
+message M3UIndexTaskDetail {
+  string MasterIndexCosPath = 1;
+}
+
+message DescribeM3UIndexDetailResponse {
+  M3UIndexTaskInfo TaskInfo = 2;
+  M3UIndexTaskDetail TaskDetail = 3;
+}
+
+message UpdateAIVideoProcessTaskRequest {
+  string MediaId = 2;
+  string TaskId = 3;
+  VideoProcessOption VideoProcessOption = 7; // 视频处理参数
+  bool AutoStart = 8;
+}
+
+message UpdateAIVideoProcessResponse {
+  string TaskId = 2;
+}
+
+message DescribeAIVideoProcessConfigRequest {
+
+}
+
+message DescribeAIVideoProcessConfigResponse {
+  google.protobuf.Struct Config = 3;
+}
+
+service AIVideoProcess {
+  // 创建AI视频处理任务
+  rpc CreateAIVideoProcessTask(CreateAIVideoProcessTaskRequest) returns (CreateAIVideoProcessResponse); // @alias=/CreateAIVideoProcessTask
+  // 获取任务详情
+  rpc DescribeAIVideoProcessDetail(DescribeAIVideoProcessDetailRequest) returns (DescribeAIVideoProcessDetailResponse); //@alias=/DescribeAIVideoProcessDetail
+  // 获取任务列表 (TODO: 前端切换调用后清理接口)
+  // NOTICE: deprecated, use DescribeTasks instead
+  rpc DescribeAIVideoProcessTasks(DescribeAIVideoProcessTasksRequest) returns (DescribeAIVideoProcessTasksResponse); // @alias=/DescribeAIVideoProcessTasks
+  // 更新AI视频处理任务
+  rpc UpdateAIVideoProcessTask(UpdateAIVideoProcessTaskRequest) returns (UpdateAIVideoProcessResponse); // @alias=/UpdateAIVideoProcessTask
+  // 获取视频处理配置
+  rpc DescribeAIVideoProcessConfig(DescribeAIVideoProcessConfigRequest) returns (DescribeAIVideoProcessConfigResponse); //@alias=/DescribeAIVideoProcessConfig
+
+  // 创建横竖屏任务 (NOTICE: 已合并到CreateAIVideoProcessTask)
+  // NOTICE: deprecated, use CreateAIVideoProcessTask instead
+  rpc CreateVideoCropTask(CreateAIVideoProcessTaskRequest) returns (CreateAIVideoProcessResponse); // @alias=/CreateVideoCropTask
+  // 更新横竖屏任务 (NOTICE: 已合并到UpdateAIVideoProcessTask)
+  // NOTICE: deprecated, use UpdateAIVideoProcessTask instead
+  rpc UpdateVideoCropTask(UpdateAIVideoProcessTaskRequest) returns (UpdateAIVideoProcessResponse); // @alias=/UpdateVideoCropTask
+
+  // 创建M3U Index任务
+  rpc CreateM3UIndexTask(CreateM3UIndexTaskRequest) returns (CreateM3UIndexTaskResponse); // @alias=/CreateM3UIndexTask
+  // 获取M3U Index任务详情
+  rpc DescribeM3UIndexDetail(DescribeM3UIndexDetailRequest) returns (DescribeM3UIndexDetailResponse); //@alias=/DescribeM3UIndexDetail
+
+  // 停止任务，内部使用对外不暴露
+  rpc StopAIVideoProcessTask(StopAIVideoProcessTaskReq) returns (StopAIVideoProcessTaskRsp); //@alias=/StopAIVideoProcessTask
+  // 删除任务，内部使用对外不暴露
+  rpc RemoveAIVideoProcessTask(RemoveAIVideoProcessTaskReq) returns (RemoveAIVideoProcessTaskRsp); //@alias=/RemoveAIVideoProcessTask
+}

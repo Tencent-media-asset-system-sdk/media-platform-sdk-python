@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+import "common.proto";
+package trpc.media.videoquality;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/videoquality";
+
+message CreateVideoQualityEvaluationTaskRequest {
+  string MediaId = 1;
+  string TaskName = 4;
+  string CallbackURL = 5;
+}
+
+message CreateVideoQualityEvaluationTaskResponse {
+  string TaskId = 1;
+}
+
+message VideoDefectLimit {
+  VideoDefectInfo.VideoDefectType DefectType = 1;
+  uint32 LowerDurationLimit = 2;
+}
+
+message AudioDefectLimit {
+  AudioDefectInfo.AudioDefectType DefectType = 1;
+  uint32 LowerDurationLimit = 2;
+}
+
+message DescribeVideoQualityLimitListRequest {
+  string RequestId = 1;
+  uint32 ProjectId = 2;
+}
+
+message DescribeVideoQualityLimitListResponse {
+  repeated VideoDefectLimit VideoDefectLimitList = 2;
+  repeated AudioDefectLimit AudioDefectLimitList = 3;
+}
+
+message DescribeVideoQualityEvaluationTaskDataRequest {
+  string TaskId = 1;
+  repeated VideoDefectLimit VideoDefectLimitList = 6;
+  repeated AudioDefectLimit AudioDefectLimitList = 7;
+}
+
+message AppearTimeInfo {
+  float StartTimeStamp = 1;
+  float EndTimeStamp = 2;
+}
+
+message VideoDefectInfo {
+  enum VideoDefectType {
+    kUnknown = 0;         // 预留不使用
+    kSnowNoise = 1;       // 雪花噪点
+    kColorBar = 2;        // 彩条
+    kMosaic = 3;          // 马赛克
+    kBlackBorder = 4;     // 黑边
+    kWhiteBorder = 5;     // 白边
+    kFrostingBorder = 6;  // 毛玻璃边
+    kShaking = 7;         // 画面抖动
+    kStatic = 8;          // 画面静止
+    kUnderExposure = 9;   // 欠曝光
+    kOverExposure = 10;   // 过曝光
+    kNoiseImage = 11;     // 噪声图像
+    kBlurImage = 12;      // 模糊图像
+    kBarCode = 13;        // 条形码
+    kQrCode = 14;         // 二维码
+    kHuaPing = 15;        // 花屏
+    kPureImage = 16;      // 纯色屏
+    kWxCode = 17;         // 微信码
+    kSizeVariant = 18;    // 画幅变化
+  }
+  VideoDefectType DefectType = 1;
+  repeated AppearTimeInfo DefectInfo = 2;
+}
+
+message AudioDefectInfo {
+  enum AudioDefectType {
+    kUnknown = 0;     // 预留不使用
+    kVolumeMute = 19;  // 静音
+    kVolumeLow = 20;   // 低音
+    kVolumeHigh = 21;  // 高音
+    kNoVolume = 22;    // 无音轨
+  }
+  AudioDefectType DefectType = 1;
+  repeated AppearTimeInfo DefectInfo = 2;
+}
+
+message QualityEvaluationInfo {
+  repeated VideoDefectInfo VideoDefectInfoList = 1;   // 视频缺陷信息列表
+  repeated AudioDefectInfo AudioDefectInfoList = 2;   // 音频缺陷信息列表
+  float VideoQualityScore = 3;                        // 视频质量分
+}
+
+message LiveVideoQualityScore {
+    float VideoQualityScore = 1;
+    AppearTimeInfo VideoQualityScoreTime = 2;
+}
+
+message LiveQualityEvaluationInfo {
+  repeated VideoDefectInfo VideoDefectInfoList = 1;   // 视频缺陷信息列表
+  repeated AudioDefectInfo AudioDefectInfoList = 2;   // 音频缺陷信息列表
+  repeated LiveVideoQualityScore VideoQualityScoreList = 3;  // 质检分列表
+  string LiveStreamURL = 4;                           // 直播流地址
+  int64 CurrentTime = 5;                             // 当前消息的时间
+}
+
+
+
+message DescribeVideoQualityEvaluationTaskDataResponse {
+  trpc.media.common.TaskInfo TaskInfo = 2;
+  QualityEvaluationInfo TaskData = 4;
+}
+
+message DescribeLiveVideoQualityEvaluationTaskDataResponse {
+  trpc.media.common.TaskInfo TaskInfo = 2;
+  LiveQualityEvaluationInfo TaskData = 4;
+}
+
+service VideoQualityEvaluation {
+  rpc CreateVideoQualityEvaluationTask(CreateVideoQualityEvaluationTaskRequest) returns
+      (CreateVideoQualityEvaluationTaskResponse); //@alias=/CreateVideoQualityEvaluationTask
+  rpc DescribeVideoQualityEvaluationTaskData(DescribeVideoQualityEvaluationTaskDataRequest) returns
+      (DescribeVideoQualityEvaluationTaskDataResponse); //@alias=/DescribeVideoQualityEvaluationTaskData
+  rpc DescribeLiveVideoQualityEvaluationTaskData(DescribeVideoQualityEvaluationTaskDataRequest) returns
+      (DescribeLiveVideoQualityEvaluationTaskDataResponse); //@alias=/DescribeLiveVideoQualityEvaluationTaskData
+  rpc DescribeVideoQualityLimitList(DescribeVideoQualityLimitListRequest) returns
+      (DescribeVideoQualityLimitListResponse);  //@alias=/DescribeVideoQualityLimitList
+}

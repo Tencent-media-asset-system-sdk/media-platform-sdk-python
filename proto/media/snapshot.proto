@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "common.proto";
+package trpc.media.snapshot;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/snapshot";
+
+message Error {
+  string Code = 1;
+  string Message = 2;
+}
+
+message CreateSnapshotRequest {
+  string RequestId = 1;
+  string TaskId = 2;
+  string FlowId = 3;
+  string ApiModule = 4;
+  int32 Priority = 6;
+  bool IsSync = 7;
+}
+
+message CreateSnapshotResponse {
+  string RequestId = 1;
+  Error Error = 2;
+  string TaskData = 3;
+  
+}
+
+message DescribeSnapshotRequest {
+  string RequestId = 1;
+  string FlowId = 2;
+}
+
+message DescribeSnapshotResponse {
+  string RequestId = 1;
+  Error Error = 2;
+  string FlowId = 3;
+  string Content = 6;
+}
+
+message UpdateSnapshotRequest {
+  string RequestId = 1;
+  string TaskId = 2;
+  string FlowId = 3;
+  string ApiModule = 4;
+  int32 Priority = 6;
+  bool IsSync = 7;
+}
+
+message UpdateSnapshotResponse {
+  string RequestId = 1;
+  Error Error = 2;
+}
+
+service Snapshot {
+  rpc CreateSnapshot(CreateSnapshotRequest) returns
+      (CreateSnapshotResponse); //@alias=/CreateSnapshot
+  rpc DescribeSnapshotData(DescribeSnapshotRequest) returns
+      (DescribeSnapshotResponse); //@alias=/DescribeSnapshotData
+  rpc UpdateSnapshot(UpdateSnapshotRequest) returns
+      (UpdateSnapshotResponse); //@alias=/UpdateSnapshot
+}

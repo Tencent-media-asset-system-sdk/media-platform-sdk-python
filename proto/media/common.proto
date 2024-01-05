@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/any.proto";
+
+package trpc.media.common;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/apicommon";
+
+
+// IVLD 智能标签
+// IVSS 智能拆条
+// IVCL 智能编目
+// IVQI 视频质检
+// IVLE 智能 logo 擦除
+// IVCE 智能字幕擦除
+// IVSR 智能超分
+// IVROT 横竖屏转换
+// IVFC 人脸集锦
+// IVSC 智能封面
+// IVTA 标签分析
+
+enum OperateStatus {
+  OPERATE_STATUS_SUCCESS = 0;              // 操作成功
+  OPERATE_STATUS_FAILED = 1;               // 操作失败
+}
+
+message OperateResponse {
+  OperateStatus Status = 1;
+  string FailedReason = 2;
+}
+
+
+message TaskTemplate {
+  string TaskName = 1;
+  string ApiModule = 2;
+  string CallbackURL = 3;
+  google.protobuf.Struct Parameter = 4; // 可以接受任何 json 对应参数
+}
+
+message FlowDirection {
+  uint32 UpIndex = 1;
+  uint32 DownIndex = 2;
+}
+
+message WorkflowTemplate {
+  repeated TaskTemplate TaskTemplateSet = 1;
+  repeated FlowDirection FlowDirectionSet = 2;
+}
+
+
+// ====================================== 内容库新增 ======================================
+enum CategoryTagType {
+  CATEGORY_TAG_TYPE_OTHER = 0;          // 其他
+  CATEGORY_TAG_TYPE_NEWS = 1;           // 新闻
+  CATEGORY_TAG_TYPE_ENTERTAINMENT  = 2; // 综艺
+  CATEGORY_TAG_TYPE_MOVIE = 3;          // 影视
+  CATEGORY_TAG_TYPE_COMPETITION = 4;    // 赛事
+  CATEGORY_TAG_TYPE_DOCUMENTARY = 5;    // 纪录片
+  CATEGORY_TAG_TYPE_INTERNETINFO = 6;   // 互联网资讯
+}
+
+// 资源状态
+enum MediaStatus {
+  MEDIA_STATUS_INVALID = 0;                      // 资源创建无效，参数检验失败
+  MEDIA_STATUS_CREATED = 1;                      // 资源创建完成, 准备上传
+  MEDIA_STATUS_COMMIT_SUCCESS = 2;               // 资源上传完成
+  MEDIA_STATUS_COMMIT_FAILED = 3;                // 资源上传失败
+  MEDIA_STATUS_IMPORT_WAITING = 4;               // 资源进入入库等待队列
+  MEDIA_STATUS_IMPORT_ANALYSING = 5;             // 资源入库中,封面未获取
+  MEDIA_STATUS_IMPORT_ANALYSED = 6;              // 资源入库完成
+  MEDIA_STATUS_IMPORT_FAILED = 7;                // 资源入库失败
+  MEDIA_STATUS_IMPORT_STOPED = 8;                // 资源暂停入库
+  MEDIA_STATUS_DELETED_SOFT = 9;                 // 资源被软删除
+  MEDIA_STATUS_DELETED_HARD = 10;                // 资源被硬删除
+  MEDIA_STATUS_IMPORT_ANALYSING_COVER_DONE = 11; // 资源入库中,封面已获取
+  MEDIA_STATUS_DELETED_SOFT_WAITING = 12;        // 资源待软删除
+  MEDIA_STATUS_DELETED_HARD_WAITING = 13;        // 资源待硬删除
+  MEDIA_STATUS_WAIT_DOWNLOAD = 14;               // 资源等待下载
+  MEDIA_STATUS_DOWNLOADING = 15;                 // 资源正在下载中
+}
+
+enum MediaType {
+  MEDIA_TYPE_OTHER = 0;                 // 其他
+  MEDIA_TYPE_VIDEO = 1;                 // 视频
+  MEDIA_TYPE_IMAGE = 2;                 // 图片
+  MEDIA_TYPE_AUDIO = 3;                 // 音频
+  MEDIA_TYPE_DOCUMENT = 4;              // 文档
+  MEDIA_TYPE_MANUSCRIPT = 5;            // 文稿
+  MEDIA_TYPE_STREAM = 6;                // 直播流
+  MEDIA_TYPE_AI_TASK_RESULT = 7; // 分析任务的结果（用于标签分析）
+}
+
+enum MediaSourceType {
+  MEDIA_SOURCE_TYPE_OTHER = 0;          // 其他
+  MEDIA_SOURCE_TYPE_FRONT_PAGE = 1;     // 首页上传
+  MEDIA_SOURCE_TYPE_IVSS = 2;           // 新闻拆条
+  MEDIA_SOURCE_TYPE_IVSR = 3;           // 视频增强
+  MEDIA_SOURCE_TYPE_TRANSCODE = 4;      // 转码素材
+  MEDIA_SOURCE_TYPE_IVSC = 5;           // 智能封面
+  MEDIA_SOURCE_TYPE_IVLD = 6;           // 智能标签
+  MEDIA_SOURCE_TYPE_EXTRACT_IMAGE = 7;  // 抽帧模块
+  MEDIA_SOURCE_TYPE_IVROT = 8;          // 横竖屏转换
+  MEDIA_SOURCE_TYPE_TTS = 9;            // 语音合成
+}
+
+enum LangType {
+  LANG_TYPE_MANDARIN = 0;                 // 普通话
+  LANG_TYPE_CANTONESE = 1;                // 粤语
+}
+
+enum FilterType {
+  FILTER_TYPE_EQUAL = 0;                // 等于
+  FILTER_TYPE_NOT_EQUAL = 1;            // 不等于
+  FILTER_TYPE_GREATER = 2;              // 大于
+  FILTER_TYPE_GREATER_EQUAL = 3;        // 大于等于
+  FILTER_TYPE_LESS = 4;                 // 小于
+  FILTER_TYPE_LESS_EQUAL = 5;           // 小于等于
+  FILTER_TYPE_IN = 6;                   // IN
+  FILTER_TYPE_NOT_IN = 7;               // NOT IN
+  FILTER_TYPE_REGEX = 8;                // REGEX
+}
+
+enum WorkflowMode {
+  WORKFLOW_MODE_SYSTEM = 0;                        // 系统入库，不进行标准化
+  WORKFLOW_MODE_CUSTOMER = 1;                      // 用户入库，进行标准化
+  WORKFLOW_MODE_CUSTOMER_SUBVERSION = 2;           // 用户入库，进行标准化,子版本
+  WORKFLOW_MODE_SYSTEM_SUBVERSION = 3;             // 系统入库，不进行标准化,子版本
+}
+
+enum WorkflowComponentType {
+  WORKFLOW_COMPONENT_TYPE_DOWNLOAD = 0;                         // 下载
+  WORKFLOW_COMPONENT_TYPE_IVLD = 1;                             // 智能标签
+  WORKFLOW_COMPONENT_TYPE_FORMAT_CONVERT = 2;                   // 格式转码
+  WORKFLOW_COMPONENT_TYPE_VIDEO_QUALITY_EVALUTION = 3;          // 视频质检
+  WORKFLOW_COMPONENT_TYPE_PERSON_RETRIEVAL = 4;                 // 人脸集锦
+  WORKFLOW_COMPONENT_TYPE_VIDEO_CONTENT_SAFETY = 5;             // 视频内容安全
+}
+
+enum SortType {
+  SORT_TYPE_ASC = 0;                     // 升序
+  SORT_TYPE_DESC = 1;                    // 降序
+}
+
+enum DeleteType {
+  DELETE_TYPE_SOFT = 0;                   // 软删除
+  DELETE_TYPE_HARD = 1;                   // 硬删除
+}
+
+enum BindType {
+  BIND_TYPE_COVER = 0;                    // 封面图绑定
+  BIND_TYPE_SUBVERSION = 1;               // 子版本绑定
+  BIND_TYPE_TRANSCODE = 2;                // 转码素材绑定
+}
+
+enum DomainGroupType {
+  DOMAIN_GROUP_TYPE_PRIVATE = 0;                   // 私有
+  DOMAIN_GROUP_TYPE_PUBLIC = 1;                   // 公开
+  DOMAIN_GROUP_TYPE_PUBLIC_CENTER = 2;            // 中心公开
+  DOMAIN_GROUP_TYPE_PUBLIC_DEPARTMENT = 3;        // 部门公开
+  DOMAIN_GROUP_TYPE_INDEPENDENT = 4;              // 独立权限
+  DOMAIN_GROUP_TYPE_GROUP = 5;            // 群组(目前没用到)
+}
+
+enum RetrieveInputType {
+  RETRIEVE_INPUT_TYPE_TEXT = 0;           // 文本检索
+  RETRIEVE_INPUT_TYPE_IMAGE_MEDIA_ID = 1; // 图片检索内容库输入
+  RETRIEVE_INPUT_TYPE_IMAGE_BASE64 = 2;   // 图片检索base64输入
+}
+
+enum RetrieveHitSourceType {
+  RETRIEVE_HIT_SOURCE_TYPE_DEFAULT = 0;   // 兜底逻辑
+  RETRIEVE_HIT_SOURCE_TYPE_ENGINE = 1;    // 检索引擎
+}
+
+enum ExtractImageType {
+  EXTRACT_IMAGE_TYPE_BASE64 = 0;         // 返回base64
+  EXTRACT_IMAGE_TYPE_MEDIA_ID = 1;       // 返回mediaID
+}
+
+// 工作流模板状态
+enum WorkflowTemplateStatus {
+  WORKFLOW_TEMPLATE_STATUS_INIT = 0;                   // 模板初始状态
+  WORKFLOW_TEMPLATE_STATUS_INACTIVE = 1;               // 模板未激活
+  WORKFLOW_TEMPLATE_STATUS_ACTIVE = 2;                 // 模板激活
+  WORKFLOW_TEMPLATE_STATUS_DELETED_SOFT = 3;           // 模板被软删除
+  WORKFLOW_TEMPLATE_STATUS_DELETED_HARD = 4;           // 模板被硬删除
+}
+
+enum RetrieveTagType {
+  RETRIEVE_TAG_TYPE_LANDMARK = 0;              // 地标
+  RETRIEVE_TAG_TYPE_PERSON = 1;                // 人脸
+}
+
+// 任务状态
+enum TaskStatus {
+  TASK_STATUS_INVALID = 0;            // 任务无效
+  TASK_STATUS_CREATED = 1;            // 任务创建并且未进入等待队列
+  TASK_STATUS_WAITING = 2;            // 任务进入等待队列
+  TASK_STATUS_ANALYSING = 3;          // 任务分析中
+  TASK_STATUS_ANALYSED = 4;           // 任务分析完成
+  TASK_STATUS_FAILED = 5;             // 任务执行失败
+  TASK_STATUS_STOPED = 6;             // 任务暂停
+  TASK_STATUS_DELETED = 7;            // 任务被删除
+  TASK_STATUS_EXPORTING = 8;          // 任务导出中
+  TASK_STATUS_CLEANED = 9;            // 任务已清理
+}
+
+message DomainGroupInfo {
+  DomainGroupType DomainGroupType = 1 [json_name="group_type"];  // 权限类型
+  string DomainGroupId = 2 [json_name="group_id"];               // 群组Id
+}
+
+message Filter {
+  string Name = 1;                                     // 过滤的字段名
+  FilterType FilterType = 2;                           // 过滤的字段的关系
+  repeated string ValueSet = 3;                        // 过滤字段对应的值
+}
+
+message Sorter {
+  string Name = 1;                                     // 排序的字段名
+  SortType SortType = 2;                               // 排序字段的值
+}
+
+message UserInfo {
+  string Uin = 1;                                      // 用户主账号
+  string SubAccountUin = 2;                            // 用户子账号
+}
+
+
+message Deleter {
+  string Name = 1;                                     // 删除字段名
+  DeleteType DeleteType = 2;                           // 删除类型：硬删除/软删除
+  repeated string ValueSet = 3;                        // 删除字段对应的值
+}
+
+message StampInfo {
+  string StartTimestamp = 1;
+  string EndTimestamp = 2;
+}
+
+message Rect {
+  int32 X = 1;
+  int32 Y = 2;
+  int32 Width = 3;
+  int32 Height = 4;
+}
+
+message Rectf {
+  float X = 1;
+  float Y = 2;
+  float Width = 3;
+  float Height = 4;
+}
+
+message TranscodeMediaInfo {
+  string TranscodeMediaId = 1;
+  TaskStatus TranscodeMediaStatus = 3;
+}
+
+message TimeInterval {
+  string StartTime = 1;
+  string EndTime = 2;
+}
+
+message DayRange {
+  string StartDay = 1;
+  string EndDay = 2;
+}
+
+
+message TaskInfo {
+  string TaskId = 1;
+  string TaskName = 2;
+  string ApiModule = 3;
+  string MediaId = 4;
+  string MediaName = 5;
+  float MediaDuration = 6;
+  TaskStatus TaskStatus = 7;
+  float TaskProgress = 8;
+  uint32 TaskTimeCost = 9;     // Time Cost in seconds
+  string TaskStartTime = 10;   // Unix timestamp
+  string TaskCreateTime = 11;  // Unix timestamp
+  string FailedReason = 12;
+  string CreateUser = 13;
+  string TaskUpdateTime = 14;  // Unix timestamp
+  TranscodeMediaInfo TranscodeMediaInfo = 15;
+  string FlowId = 16;
+  string Parameter = 17;
+  MediaType MediaType = 18;
+  CategoryTagType MediaTag = 19;
+}

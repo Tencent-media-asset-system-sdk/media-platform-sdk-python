@@ -1,0 +1,349 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package trpc.media.videostructure;
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/videostructure";
+
+
+
+message AudioInfo  {
+  string Content = 1;
+  float StartTimeStamp = 2;
+  float EndTimeStamp = 3;
+  string Tag = 4;
+}
+
+message TextInfo {
+  string Tag = 1;
+  string Content = 2;
+  float StartTimeStamp = 3;
+  float EndTimeStamp = 4;
+}
+
+message AppearFrameInfo {
+  trpc.media.common.Rect Rect = 1;
+  string FrameIndex     = 2;  // 目标出现的帧号
+  float Quality     = 3;  //质量总分
+}
+
+message AppearTimeInfo {
+  float StartTimeStamp = 1;
+  float EndTimeStamp = 2;
+  string ImageMediaId = 3;
+  float Confidence = 4;
+  string StartFrameIndex = 5;
+  string EndFrameIndex = 6;
+  repeated AppearFrameInfo DetailFrames = 7;   //目标出现的位置信息
+}
+
+message AppearPostionInfo {
+  int32 Index = 1;
+  int32 StartPosition = 2;
+  int32 EndPosition = 3;
+}
+
+message PersonTagInfo {
+  string Name = 1;
+  string Job = 2;
+  string FirstAppearTab = 3;
+  repeated AppearPostionInfo AudioAppearSet = 4;
+  repeated AppearPostionInfo TextAppearSet = 5;
+  repeated AppearTimeInfo VisionAppearSet = 6;
+  trpc.media.common.Rect AppearRect = 7;
+  int32 Sensitive = 8;
+  string PersonID = 9;
+}
+
+message L1ClassifiedPersonInfo {
+  string ClassifyName = 1;
+  repeated L2ClassifiedPersonInfo L2ClassifiedPersonInfoSet = 2;
+}
+
+message L2ClassifiedPersonInfo {
+  string ClassifyName = 1;
+  repeated PersonTagInfo PersonSet = 2;
+}
+
+message UnknownPerson {
+  repeated AppearTimeInfo VisionAppearSet = 1;
+  bool PutLibraryAllowed = 2;
+  trpc.media.common.Rect AppearRect = 3;
+  int32 Sensitive = 4;
+  string UnknownPersonID = 5;
+}
+
+message MultiLevelTag {
+  string TagName = 1;
+  repeated MultiLevelTag SubTagSet = 2;
+  int32 Level = 3;
+  string FirstAppearTab = 4;
+  repeated AppearPostionInfo AudioAppearSet = 5;
+  repeated AppearPostionInfo TextAppearSet = 6;
+  repeated AppearTimeInfo VisionAppearSet = 7;
+  double Score = 8;
+  bool IsSensitive = 9;
+  int32 Rank = 10;
+}
+
+message MajorEvent {
+  string EventName = 1;
+  repeated MultiLevelTag EventTimeSet = 2;
+  repeated MultiLevelTag EventPlaceSet = 3;
+  repeated MultiLevelTag EventOrganizationSet = 4;
+  repeated PersonTagInfo EventPersonSet = 5;
+  MultiLevelTag Event = 6;
+  repeated MultiLevelTag EventVictimPositionSet = 7;
+  repeated MultiLevelTag EventCriminalPositionSet = 8;
+}
+
+message AILensInfo {
+  string Type = 1;
+  string ImageMediaId = 2;
+  float StartTimeStamp = 3;
+  float EndTimeStamp = 4;
+  repeated L1ClassifiedPersonInfo ClassifiedPersonInfoSet = 5;
+  repeated MultiLevelTag TextTagSet = 6;
+  repeated MultiLevelTag FrameTagSet = 7;
+  string Scenery = 8;
+  string FilmingAngle = 9;
+  string ShootingMode = 10;
+  repeated string AuxiliaryTagSet = 11;
+  string ID = 12;
+  string Title = 13;
+  repeated UnknownPerson UnknownPersonSet = 14;
+  string SceneryShot = 15;
+  bool ActualSound = 16;
+}
+
+message AISceneInfo {
+  string Type = 1;
+  string ImageMediaId = 2;
+  float StartTimeStamp = 3;
+  float EndTimeStamp = 4;
+  repeated L1ClassifiedPersonInfo ClassifiedPersonInfoSet = 5;
+  repeated MultiLevelTag TextTagSet = 6;
+  repeated MultiLevelTag FrameTagSet = 7;
+  string FineGrained = 8;
+  repeated int32 LensIndexSet = 9;
+  string ID = 10;
+  repeated UnknownPerson UnknownPersonSet = 11;
+  repeated L1ClassifiedPersonInfo SuspiciousPersonSet = 12;
+}
+
+message AISnippetInfo {
+  string Type = 2;
+  string ImageMediaId = 3;
+  float StartTimeStamp = 4;
+  float EndTimeStamp = 5;
+  repeated string TitleSet = 6;
+  repeated string SummarySet = 7;
+  repeated PersonTagInfo HostInfoSet = 8;
+  repeated PersonTagInfo ReporterInfoSet = 9;
+  repeated L1ClassifiedPersonInfo ClassifiedPersonInfoSet = 10;
+  repeated MultiLevelTag TextTagSet = 11;
+  repeated MultiLevelTag FrameTagSet = 12;
+  repeated string SummaryTagSet = 13;
+  repeated int32 SceneIndexSet = 14;
+  repeated int32 LensIndexSet = 15;
+  string ID = 16;
+  repeated MajorEvent MajorEventSet = 17;
+  repeated string ShortSummarySet = 18;
+  repeated UnknownPerson UnknownPersonSet = 19;
+  repeated L1ClassifiedPersonInfo SuspiciousPersonSet = 20;
+}
+
+message AudioCaptionInfo  {
+  float StartTimeStamp = 1;
+  float EndTimeStamp = 2;
+  string Content = 3;
+}
+
+message ShowInfo {
+  trpc.media.common.CategoryTagType Type = 1;
+  string Date = 2;
+  string Logo = 3;
+  string Column = 4;
+  string Source = 5;
+  string ImageMediaId = 6;
+  repeated string SummarySet = 7;
+  repeated string TitleSet = 8;
+  repeated AudioInfo AudioInfoSet = 9;
+  repeated TextInfo TextInfoSet = 10;
+  repeated PersonTagInfo HostInfoSet = 11;
+  repeated PersonTagInfo ReporterInfoSet = 12;
+  repeated L1ClassifiedPersonInfo ClassifiedPersonInfoSet = 13;
+  repeated MultiLevelTag TextTagSet = 14;
+  repeated MultiLevelTag FrameTagSet = 15;
+  repeated string MediaClassifierSet = 17;
+  repeated string SummaryTagSet = 18;
+  repeated UnknownPerson UnknownPersonSet = 19;
+  repeated AudioCaptionInfo AudioCaptionSet = 20;
+  repeated SymbolInfo SymbolInfoSet = 21;   //标识检测信息集
+  repeated L1ClassifiedPersonInfo SuspiciousPersonSet = 22;
+}
+
+
+message ImageOcr {
+  string Content = 1;
+  trpc.media.common.Rect AppearRect = 2;
+}
+
+message ImageLogo {
+  string Logo = 1;
+  trpc.media.common.Rect AppearRect = 2;
+}
+
+
+
+message AITagTaskData {
+  ShowInfo ShowInfo = 1;
+}
+
+
+message AITagAudioTaskData {
+  repeated AudioInfo AudioInfoSet = 1;
+  repeated MultiLevelTag TextTagSet = 2;
+  repeated AudioCaptionInfo AudioCaptionSet = 3;
+}
+
+message AITagTextTaskData {
+  string Content = 1;
+  string Summary = 2;
+  repeated MultiLevelTag TextTagSet = 3;
+}
+
+
+message AITagImageTaskData {
+  repeated ImageOcr OcrSet = 1;
+  repeated MultiLevelTag FrameTagSet = 2;
+  repeated L1ClassifiedPersonInfo ClassifiedPersonInfoSet = 3;
+  ImageLogo TvLogo = 4;
+  ImageLogo SourceLogo = 5;
+  repeated UnknownPerson UnknownPersonSet = 6;
+  repeated SymbolInfo SymbolInfoSet = 7;
+  repeated L1ClassifiedPersonInfo SuspiciousPersonSet = 8;
+}
+
+message AICatalogTaskData {
+  ShowInfo ShowInfo = 1;
+  repeated AISnippetInfo SnippetInfoSet = 2;
+  repeated AISceneInfo SceneInfoSet = 3;
+  repeated AILensInfo LensInfoSet = 4;
+}
+
+message AICutTaskData {
+  ShowInfo ShowInfo = 1;
+  repeated AISnippetInfo SnippetInfoSet = 2;
+}
+
+
+message CreateVideoStructureTaskRequest {
+  string MediaId = 1;
+  string TaskName = 4;
+  string CallbackURL = 5;
+}
+
+message CreateVideoStructureTaskResponse {
+  string TaskId = 2;
+}
+
+
+message DescribeAITagTaskDataRequest {
+  string TaskId = 1;
+}
+
+message DescribeVideoShotCoverRequest {
+  string MediaId = 1;
+  float StartTimeStamp = 2;
+  float EndTimeStamp = 3;
+}
+
+message DescribeVideoShotCoverResponse {
+  trpc.media.common.TaskInfo TaskInfo = 1;
+  string CoverId = 2;
+  string CoverUrl = 3;
+}
+
+message DescribeAITagTaskDataResponse {
+  AITagTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+}
+
+message DescribeAITagImageTaskDataResponse {
+  AITagImageTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+}
+
+
+message DescribeAITagAudioTaskDataResponse {
+  AITagAudioTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+}
+
+
+message DescribeAITagTextTaskDataResponse {
+  AITagTextTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+}
+
+
+message DescribeAICatalogTaskDataRequest {
+  string TaskId = 1;
+  uint32 OutputMode = 2;
+}
+
+message DescribeAICatalogTaskDataResponse {
+  AICatalogTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+}
+
+
+message DescribeAICutTaskDataRequest {
+  string TaskId = 1;
+}
+
+message DescribeAICutTaskDataResponse {
+  AICutTaskData TaskData = 1;
+  trpc.media.common.TaskInfo TaskInfo = 2;
+}
+
+message SymbolInfo {
+  string Name	= 1;	                      //标识名称，如：中国国旗
+  string Type	= 2;	                      //标识类型名称，如：旗帜标识
+  float StartTime	= 3;	                  //标识检测开始时间
+  float EndTime	= 4;	                    //标识检测结束时间
+  repeated SymbolPosition Positions	= 5;	//标识出现的位置数据集
+  string FirstAppearTab = 6;              //点击标签时的跳转信息，固定值为：VisionTab
+}
+
+message SymbolPosition {
+  float Confidence = 1;   	        //该图像识别成为该标签的置信度
+  int32 FrameIndex = 2;	          //标识出现的帧号
+  float TimeStamp	= 3;            //标识出现的时间戳
+  trpc.media.common.Rectf Position =4;		  //标识在图像中出现的位置
+}
+
+service AITag {
+  rpc CreateAITagTask(CreateVideoStructureTaskRequest) returns (CreateVideoStructureTaskResponse); // @alias=/CreateAITagTask
+  rpc DescribeAITagTaskData(DescribeAITagTaskDataRequest) returns (DescribeAITagTaskDataResponse); // @alias=/DescribeAITagTaskData
+  rpc DescribeAITagAudioTaskData(DescribeAITagTaskDataRequest) returns (DescribeAITagAudioTaskDataResponse); // @alias=/DescribeAITagAudioTaskData
+  rpc DescribeAITagImageTaskData(DescribeAITagTaskDataRequest) returns (DescribeAITagImageTaskDataResponse); // @alias=/DescribeAITagImageTaskData
+  rpc DescribeAITagTextTaskData(DescribeAITagTaskDataRequest) returns (DescribeAITagTextTaskDataResponse); // @alias=/DescribeAITagTextTaskData
+  rpc DescribeVideoShotCover(DescribeVideoShotCoverRequest) returns (DescribeVideoShotCoverResponse); // @alias=/DescribeVideoShotCover
+}
+
+
+
+service AICatalog {
+  rpc CreateAICatalogTask(CreateVideoStructureTaskRequest) returns (CreateVideoStructureTaskResponse); // @alias=/CreateAICatalogTask
+  rpc DescribeAICatalogTaskData(DescribeAICatalogTaskDataRequest) returns (DescribeAICatalogTaskDataResponse); // @alias=/DescribeAICatalogTaskData
+}
+
+
+
+service AICut {
+  rpc CreateAICutTask(CreateVideoStructureTaskRequest) returns (CreateVideoStructureTaskResponse); // @alias=/CreateAICutTask
+  rpc DescribeAICutTaskData(DescribeAICutTaskDataRequest) returns (DescribeAICutTaskDataResponse); // @alias=/DescribeAICutTaskData
+}
+

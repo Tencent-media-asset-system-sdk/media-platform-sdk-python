@@ -1,0 +1,215 @@
+syntax = "proto3";
+
+import "common.proto";
+import "video_structure.proto";
+package trpc.media.aitaganalyse;
+
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/aitaganalyse";
+
+
+enum TagClass {
+  TAGCLASS_INVALID = 0;
+  TAGCLASS_NLP = 1;
+  TAGCLASS_IMAGEFRAME = 2;
+}
+
+message SnippetResult {
+  float StartTime = 1;
+  float EndTime = 2;
+  string L1LabelName = 3;
+  string L2LabelName = 4;
+  string Tag = 5;
+  TagClass TagClass = 6;
+
+}
+
+message KafkaTagAnalyseResult {
+  repeated SnippetResult SnippetResultSet = 1;
+}
+
+message TagOperation {
+  string TagId = 1;
+  string Name=2;
+  string FilterLevel =  3;
+  string Category = 4;
+  string L1LabelName = 5;
+  string L2LabelName = 6;
+  string TagType = 7;
+  string FileKey = 8;
+  string CreateTime = 9;
+  string UpdatedTime = 10;
+}
+
+message L2Label {
+  string LabelName = 2;
+}
+
+message L1Label {
+  string LabelName = 1;
+  repeated L2Label L2LabelSet = 2;
+}
+
+message DescribeL1L2LabelsResponse {
+  repeated L1Label LabelSet = 3;
+}
+
+message CommonRequest{
+}
+
+// CreateTag
+message CreateTagRequest{
+  TagOperation Tag =1;
+}
+
+message CreateTagResponse{
+  string TagId = 1;
+}
+
+//ImportTag
+message ImportTagRequest{
+  string FileName =3;
+  string FileKey = 4;
+  string L1LabelName =5;
+  string L2LabelName =6;
+  string TagType =7 ;
+  string FilterLevel =  8 ;
+  string Category = 9 ;
+  string DeprecatedFileKey = 12;
+}
+
+message ImportTagResponse{
+  string Id = 1;
+}
+
+//DeleteTag
+message DeleteTagRequest{
+  string TagId = 1;
+}
+
+message DeleteTagResponse{
+  string TagId = 1;
+}
+
+//ModifyTag
+message ModifyTagRequest{
+  TagOperation Tag = 1;
+}
+
+message ModifyTagResponse{
+  string TagId = 1;
+}
+
+//DescribeTags
+message TagFilter {
+  string Name = 1;
+  repeated string Values = 2;
+}
+
+message SortBy {
+  string By = 1;
+  bool Descend = 2;
+}
+
+message DescribeTagsRequest{
+  uint32 PageNumber = 3;
+  uint32 PageSize = 4;
+  repeated TagFilter FilterSet = 5;
+  SortBy Sort = 6;
+}
+
+message DescribeTagsResponse{
+  int32 TotalCount = 3;
+  repeated TagOperation TagSet = 4;
+}
+
+//CreateTagAnalysisTask
+message CreateTagAnalysisTaskRequest{
+  repeated string ImportTaskIds = 3;
+  string CallbackURL = 6;
+}
+
+message TaskItem{
+  string ImportTaskId = 1;
+  string TaskId = 2;
+  string ErrMsg = 3;
+}
+
+message CreateTagAnalysisTaskResponse{
+  repeated TaskItem TaskSet = 3;
+}
+
+//DescribeTagAnalysisTaskDataRequest
+message DescribeTagAnalysisTaskDataRequest{
+  string TaskId = 3;
+  string TagDisplayType = 6;
+}
+
+message AITagAnalysisTaskData {
+  trpc.media.videostructure.AITagTaskData TagTaskData = 1;
+  trpc.media.videostructure.AITagAudioTaskData TagAudioTaskData = 2;
+  trpc.media.videostructure.AITagImageTaskData TagImageTaskData = 3;
+  trpc.media.videostructure.AITagTextTaskData TagTextTaskData = 4;
+  trpc.media.videostructure.AICatalogTaskData CatalogTaskData = 5;
+  trpc.media.videostructure.AICutTaskData CutTaskData = 6;
+}
+
+message DescribeTagAnalysisTaskDataResponse{
+  AITagAnalysisTaskData TaskData = 2;
+  trpc.media.common.TaskInfo TaskInfo = 3;
+}
+
+message TagFile{
+  string Name = 1;
+  string FileKey = 2;
+  string L1LabelName = 3;
+  string L2LabelName = 4;
+  string TagType = 5;
+  string CreateTime = 6;
+  string UpdatedTime = 7;
+  string Category = 8;
+  string DeprecatedFileKey = 9;
+  string Id = 10;
+}
+
+message DescribeTagFilesRequest{
+  uint32 PageNumber = 3;
+  uint32 PageSize = 4;
+  repeated TagFilter FilterSet = 5;
+  SortBy Sort = 6;
+}
+
+message DescribeTagFilesResponse{
+  int32 TotalCount = 3;
+  repeated TagFile TagFileSet = 4;
+}
+
+message DeleteTagFilesRequest{
+  string FileKey = 3;
+}
+
+message DeleteTagFilesResponse{
+}
+
+message TagFileUrlRequest{
+  string FileKey = 3;
+}
+
+message TagFileUrlResponse{
+  string Url = 3;
+}
+
+service AiTagAnalyse {
+  rpc DescribeL1L2Labels(CommonRequest) returns (DescribeL1L2LabelsResponse); // @alias=/DescribeL1L2Labels
+  rpc CreateTag(CreateTagRequest) returns (CreateTagResponse); // @alias=/CreateTag
+  rpc ImportTag(ImportTagRequest) returns (ImportTagResponse); // @alias=/ImportTag
+  rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse); // @alias=/DeleteTag
+  rpc ModifyTag(ModifyTagRequest) returns (ModifyTagResponse); // @alias=/ModifyTag
+  rpc DescribeTags(DescribeTagsRequest) returns (DescribeTagsResponse); // @alias=/DescribeTags
+  rpc CreateTagAnalysisTask(CreateTagAnalysisTaskRequest) returns (CreateTagAnalysisTaskResponse); // @alias=/CreateTagAnalysisTask
+  rpc DescribeTagAnalysisTaskData(DescribeTagAnalysisTaskDataRequest) returns (DescribeTagAnalysisTaskDataResponse); // @alias=/DescribeTagAnalysisTaskData
+
+  rpc DescribeTagFiles(DescribeTagFilesRequest) returns (DescribeTagFilesResponse);// @alias=/DescribeTagFiles
+  rpc DeleteTagFiles(DeleteTagFilesRequest) returns (DeleteTagFilesResponse);// @alias=/DeleteTagFiles
+  rpc GetTagFileUrl(TagFileUrlRequest) returns (TagFileUrlResponse);// @alias=/GetTagFileUrl
+}
+

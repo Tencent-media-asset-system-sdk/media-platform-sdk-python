@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+import "common.proto";
+import "media.proto";
+import "task_data.proto";
+
+package trpc.media.ningbotv;
+option go_package = "github.com/Tencent-media-asset-system-sdk/media-platform-sdk-go/protobuf-spec/ningbotv";
+
+message InnerMediaInfo {
+  string MediaId = 1;
+  trpc.media.media.MediaUnionInfo MediaUnionInfo = 2;
+}
+
+message TransferInnerMediasOutsideReq {
+  InnerMediaInfo InnerMediaInfo = 1;
+  string RequestId = 2;
+}
+
+message Error {
+  string Code = 1;
+  string Message = 2;
+}
+
+message CommonRsp {
+  string RequestId = 1;
+  Error Error = 2;
+}
+
+enum EventType {
+  UNKOWN = 0;
+  EVENT_IMPORT_SUCCESS = 1;
+  EVENT_TRANSCODING = 2;
+  EVENT_COVER_IMAGE = 3;
+  EVENT_STRUCTURATION = 4;
+  EVENT_FEATURE_SAVE = 5;
+  EVENT_FAIL = 6;
+}
+
+message MediaCallBackReq {
+  string MediaId = 1;
+  EventType EventType = 2;
+  trpc.media.common.MediaStatus MediaStatus = 3;
+  string FadiledReason  = 4;
+}
+
+message TransferCallbackReq {
+  string MediaId = 1;
+  trpc.media.common.OperateResponse OperateResponse = 2;
+  trpc.media.taskdata.AllTaskData TaskData = 13;      
+}
+
+message TransferCallbackRsp {
+}
+
+service Callback{
+  rpc TransferCallback(TransferCallbackReq) returns (TransferCallbackRsp); // @alias=/TransferCallback
+}
+
+service IPassMock {
+  rpc TransferInnerMediaOutside(TransferInnerMediasOutsideReq) returns (CommonRsp); // @alias=/TransferInnerMediaOutside
+  rpc InnerMediaCallBack(MediaCallBackReq) returns (CommonRsp); // @alias=/InnerMediaCallBack
+  rpc OutsideMediaCallBack(MediaCallBackReq) returns (CommonRsp); // @alias=/OutsideMediaCallBack
+}
