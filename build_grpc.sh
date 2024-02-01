@@ -56,6 +56,6 @@ gen "mediasdk/protobufspec/" "text_summarization"
 
 gen "mediasdk/protobufspec/" "shot_match"
 
-find ./mediasdk/protobufspec -type f -name "*.py" -exec sed -i "s#import grpc#import grpc_mock as grpc#g" {} \;
+find ./mediasdk/protobufspec -type f -name "*.py" -exec sed -i "s#import grpc#import mediasdk.grpc_mock as grpc#g" {} \;
 
 sed -i -E 's/^(import.*_pb2)/from . \1/' ./mediasdk/protobufspec/*.py
